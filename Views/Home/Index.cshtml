@@ -4,5 +4,23 @@
 
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <p>to Charity Management System.</p>
 </div>
+
+@section Scripts{
+    <script type="text/javascript">
+        //trigger when loaded
+        $(document).ready(function () {
+
+            var successMsg = "@Html.Raw(TempData["successMsg"])";
+
+            if (successMsg)
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Congratulations',
+                    text: successMsg
+                })
+        })
+
+    </script>
+}

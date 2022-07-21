@@ -36,6 +36,14 @@ namespace CharityMS.Areas.Identity.Pages.Account.Manage
             [Phone]
             [Display(Name = "Phone number")]
             public string PhoneNumber { get; set; }
+
+            [Required]
+            [Display(Name = "Full Name")]
+            public string FullName { get; set; }
+
+            [Required]
+            [Display(Name = "Address")]
+            public string Address { get; set; }
         }
 
         private async Task LoadAsync(User user)
@@ -47,7 +55,9 @@ namespace CharityMS.Areas.Identity.Pages.Account.Manage
 
             Input = new InputModel
             {
-                PhoneNumber = phoneNumber
+                PhoneNumber = phoneNumber,
+                Address = user.Address,
+                FullName = user.FullName
             };
         }
 
@@ -86,6 +96,13 @@ namespace CharityMS.Areas.Identity.Pages.Account.Manage
                     StatusMessage = "Unexpected error when trying to set phone number.";
                     return RedirectToPage();
                 }
+            }
+
+            var updateResult = await _userManager.UpdateAsync(user);
+            if (!updateResult.Succeeded)
+            {
+                StatusMessage = "Unexpected error when trying to update user.";
+                return RedirectToPage();
             }
 
             await _signInManager.RefreshSignInAsync(user);

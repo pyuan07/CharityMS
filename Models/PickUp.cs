@@ -8,19 +8,19 @@ namespace CharityMS.Models
 {
     public class PickUp
     {
-        public Guid id { get; set; }
+        public Guid Id { get; set; }
 
-        public User donor { get; set; }
+        public User Donor { get; set; }
 
-        public User pickUpStaff { get; set; }
+        public User PickUpStaff { get; set; }
 
-        public string location { get; set; }
+        public string Location { get; set; }
 
-        public DateTime pickUpDate { get; set; }
+        public DateTime PickUpDate { get; set; }
 
-        public List<string> donations { get; set; }
+        public List<string> Donations { get; set; }
 
-        public string status { get; set; }//change to enum
+        public string Status { get; set; }//change to enum
 
     }
 }

@@ -1,0 +1,117 @@
+﻿@model List<CharityMS.ViewModels.InventoryVM>
+@{
+    ViewData["Title"] = "InventoryList";
+}
+
+<h1>Inventory List</h1>
+
+@if (ViewBag.msg != "")
+{
+    <script>alert("@ViewBag.msg");</script>
+}
+
+<a asp-action="InsertInventory">Add Record to Inventory Table</a>
+
+<div class="container">
+    <br />
+    <br />
+    <form method="post" asp-action="InventoryList">
+        <label>Enter value that you wish to search: </label>
+        <select name="category">
+            <option value="">Select</option>
+            <option value="food">food</option>
+            <option value="breverage">breverage</option>
+            <option value="electronics">electronics</option>
+            <option value="clothe">clothe</option>
+        </select>
+        <br />
+        <br />
+        <button type="submit" name="submit" class=" btn btn-success">Search</button>
+    </form>
+
+    @if (ViewBag.msg == "Data was found!")
+    {
+        <hr />
+        <br />
+        <p>Number of the transaction found in this search result : @Model.Count</p>
+        <div class="row">
+            @{ string donorId = "", inventoryId = "";}
+            @foreach (var item in Model)
+            {
+                <div style="display:inline-block; background-color: lightblue; text-align:left; margin:10px 10px 10px 10px; padding:12px 12px 12px 12px" class="col-md-4">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label>Donor_Name:</label>
+                        </div>
+                        <div class="col-md-9">
+                            <input type="text" asp-for="@item.DonorID" value="@item.DonorID" disabled />
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label>Category:</label>
+                        </div>
+                        <div class="col-md-9">
+                            <select asp-for="@item.Category" asp-items="@item.Categories" class="form-control" disabled></select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label>Item_Name:</label>
+                        </div>
+                        <div class="col-md-9">
+                            <input type="text" asp-for="@item.Name" value="@item.Name" disabled />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label>Quantity:</label>
+                        </div>
+                        <div class="col-md-9">
+                            <input type="number" asp-for="@item.Quantity" value="@item.Quantity" disabled/>
+                        </div>
+                    </div>
+
+
+                    @if (!String.IsNullOrEmpty(@item.ExpiredDate))
+                    {
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label>Expired Date:</label>
+                            </div>
+                            <div class="col-md-9">
+                                <input type="date" asp-for="@item.ExpiredDate"disabled />
+                            </div>
+                        </div>
+                    }
+
+                    @if (@item.ProductCondition != null)
+                    {
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label>Condition:</label>
+                            </div>
+                            <div class="col-md-9">
+                                <select asp-for="@item.ProductCondition" asp-items="@item.Conditions" class="form-control" disabled></select>
+                            </div>
+                        </div>
+                    }
+
+
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label>Status:</label>
+                        </div>
+                        <div class="col-md-9">
+                            <select asp-for="@item.Status" asp-items="@item.Statusddl" class="form-control" disabled></select>
+                        </div>
+                    </div>
+                    <a asp-action="updateInventory" asp-controller="Inventory" asp-route-donorId="@donorId" asp-route-inventoryId="@inventoryId"><button class=" btn btn-info">Edit</button></a>
+                    &nbsp;
+                    <a asp-action="deleteInventory" asp-controller="Inventory" asp-route-donorId="@donorId" asp-route-inventoryId="@inventoryId"><button class="btn btn-danger">Delete</button></a>
+                </div>
+            }
+        </div>
+    }
+</div>

@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using CharityMS.Data;
 
 namespace CharityMS.Areas.Identity.Pages.Account
 {
@@ -21,6 +22,7 @@ namespace CharityMS.Areas.Identity.Pages.Account
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
         private readonly ILogger<LoginModel> _logger;
+        private readonly CharityMSdbContext _context;
 
         public LoginModel(SignInManager<User> signInManager, 
             ILogger<LoginModel> logger,
@@ -53,6 +55,8 @@ namespace CharityMS.Areas.Identity.Pages.Account
 
             [Display(Name = "Remember me?")]
             public bool RememberMe { get; set; }
+
+            public bool IsStaff { get; set; }
         }
 
         public async Task OnGetAsync(string returnUrl = null)

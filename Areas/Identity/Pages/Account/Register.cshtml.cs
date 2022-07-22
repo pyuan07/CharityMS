@@ -24,17 +24,20 @@ namespace CharityMS.Areas.Identity.Pages.Account
         private readonly UserManager<User> _userManager;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
         public RegisterModel(
             UserManager<User> userManager,
             SignInManager<User> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _roleManager = roleManager;
         }
 
         [BindProperty]
@@ -89,12 +92,19 @@ namespace CharityMS.Areas.Identity.Pages.Account
                     Email = Input.Email,
                     Address = Input.Address,
                     FullName = Input.FullName,
-
+                    NormalizedUserName = Input.FullName,
                     EmailConfirmed = true
                 };
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
                 {
+                    var roleExist1 = await _roleManager.RoleExistsAsync("User");
+                    if (!roleExist1) await _roleManager.CreateAsync(new IdentityRole("User"));
+
+                    var roleExist2 = await _roleManager.RoleExistsAsync("Staff");
+                    if (!roleExist2) await _roleManager.CreateAsync(new IdentityRole("Staff"));
+
+                    _userManager.AddToRoleAsync(user, "User").Wait();
                     _logger.LogInformation("User created a new account with password.");
 
                     //var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -115,7 +125,7 @@ namespace CharityMS.Areas.Identity.Pages.Account
                     //else
                     //{
                         TempData["successMsg"] = "Register Successfully";
-                    
+
                         //await _signInManager.SignInAsync(user, isPersistent: false);
                         return LocalRedirect(returnUrl);
                     //}

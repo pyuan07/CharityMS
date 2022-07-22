@@ -21,6 +21,7 @@ namespace CharityMS.Areas.Identity
                         context.Configuration.GetConnectionString("CharityMSdbContextConnection")));
 
                 services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = true)
+                    .AddRoles<IdentityRole>()
                     .AddEntityFrameworkStores<CharityMSdbContext>();
             });
         }

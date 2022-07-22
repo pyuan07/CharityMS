@@ -1,0 +1,22 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+}
+
+@if (ViewBag.msg != "")
+{
+    <script>alert("@ViewBag.msg");</script>
+}
+<center>
+    <h1>Inventory Operations: </h1>
+    <br />
+    <br />
+    <a asp-action="createTable" asp-controller="Inventory">Create Table Operation</a>
+    &nbsp;&nbsp;&nbsp;
+    <a asp-action="InsertInventory">Add Record to Inventory Table</a>
+    &nbsp;&nbsp;&nbsp;
+    <a>View Record from Inventory Table</a>
+    &nbsp;&nbsp;&nbsp;
+    <a asp-action="InventoryList">Search a record from Inventory Table</a>
+    &nbsp;&nbsp;&nbsp;
+</center>

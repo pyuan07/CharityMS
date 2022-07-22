@@ -1,0 +1,91 @@
+﻿@model CharityMS.ViewModels.InventoryVM
+@{
+    ViewData["Title"] = "updateInventory";
+}
+
+<h1>Update Inventory</h1>
+<div class="container">
+        <br /><hr /><br />
+        <form method="post" asp-action="updateData">
+            <div class="card" style="background-color:lightblue; padding:12px;">
+                <div class="form-field">
+                    <input type="hidden" asp-for="DonorID" value="@Model.DonorID" />
+                    <input type="hidden" asp-for="InventoryID" value="@Model.InventoryID" />
+                    <input type="hidden" asp-for="Category" value="@Model.Category" />
+                    <div class="row">
+                        <div class="col-md-2">
+                            <label>Donor Name:</label>
+                        </div>
+                        <div class="col-md-5">
+                            <input type="text" asp-for="DonorID" value="@Model.DonorID" disabled />
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-2">
+                            <label>Category:</label>
+                        </div>
+                        <div class="col-md-5">
+                            <select asp-for="Category" asp-items="@Model.Categories" class="form-control" disabled></select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-2">
+                            <label>Item Name:</label>
+                        </div>
+                        <div class="col-md-5">
+                            <input type="text" asp-for="Name" value="@Model.Name" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-2">
+                            <label>Quantity:</label>
+                        </div>
+                        <div class="col-md-5">
+                            <input type="number" asp-for="Quantity" value="@Model.Quantity" />
+                        </div>
+                    </div>
+
+
+                    @if (!String.IsNullOrEmpty(Model.ExpiredDate))
+                    {
+                        <div class="row">
+                            <div class="col-md-2">
+                                <label>ExpiredDate:</label>
+                            </div>
+                            <div class="col-md-5">
+                                <input type="date" asp-for="@Model.ExpiredDate" />
+                            </div>
+                        </div>
+                    }
+
+                    @if (Model.ProductCondition != null)
+                    {
+                        <div class="row">
+                            <div class="col-md-2">
+                                <label>Condition:</label>
+                            </div>
+                            <div class="col-md-5">
+                                <select asp-for="ProductCondition" asp-items="@Model.Conditions" class="form-control"></select>
+                            </div>
+                        </div>
+                    }
+
+
+                    <div class="row">
+                        <div class="col-md-2">
+                            <label>Status:</label>
+                        </div>
+                        <div class="col-md-5">
+                            <select asp-for="Status" asp-items="@Model.Statusddl" class="form-control"></select>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="=col-md-2">
+                    <button class="btn btn-primary" type="submit">Update</button>
+                </div>
+                
+            </div>
+        </form>
+</div>

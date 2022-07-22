@@ -1,0 +1,75 @@
+﻿@model CharityMS.ViewModels.InventoryVM
+@{
+    ViewData["Title"] = "InsertInventory";
+}
+
+@if (ViewBag.msg != "")
+{
+    <script>alert("@ViewBag.msg");</script>
+}
+
+    <h1>Insert Inventory Form:</h1>
+    <br />
+    <br />
+    <div style="background-color:lightcyan;margin-top:10px;margin-bottom:10px;padding:12px 12px 12px 12px">
+        <form method="post" asp-action="InsertInventory">
+            <div class="card" style="background-color:lightblue; padding:12px;">
+                <div class="form-field">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <label>Donor Name:</label>
+                        </div>
+                        <div class="col-md-5">
+                            <input type="text" asp-for="DonorID" value="@Model.DonorID"  />
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-2">
+                            <label>Category:</label>
+                        </div>
+                        <div class="col-md-5">
+                            <select asp-for="Category" asp-items="@Model.Categories" class="form-control" ></select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-2">
+                            <label>Item Name:</label>
+                        </div>
+                        <div class="col-md-5">
+                            <input type="text" asp-for="Name" value="@Model.Name" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-2">
+                            <label>Quantity:</label>
+                        </div>
+                        <div class="col-md-5">
+                            <input type="number" asp-for="Quantity" value="@Model.Quantity" />
+                        </div>
+                    </div>
+                        <div class="row">
+                            <div class="col-md-2">
+                                <label>ExpiredDate:</label>
+                            </div>
+                            <div class="col-md-5">
+                                <input type="date" asp-for="@Model.ExpiredDate" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-2">
+                                <label>Condition:</label>
+                            </div>
+                            <div class="col-md-5">
+                                <select asp-for="ProductCondition" asp-items="@Model.Conditions" class="form-control"></select>
+                            </div>
+                        </div>
+
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-primary" type="submit">Update</button>
+                </div>
+                
+            </div>
+        </form>
+    </div>

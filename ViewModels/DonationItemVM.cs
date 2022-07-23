@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace CharityMS.Models
+namespace CharityMS.ViewModels
 {
-    public class Item
+    public class DonationItemVM
     {
-        [Key]
-        public Guid Id { get; set; }
         public string ItemName { get; set; }
         public int Quantity { get; set; }
     }

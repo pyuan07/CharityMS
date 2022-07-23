@@ -1,0 +1,109 @@
+﻿@model CharityMS.ViewModels.PickUpVM
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>Pick Up</h4>
+<hr />
+<div>
+    <form id="createForm" asp-action="Create">
+
+        <div class="form-group row mb-2">
+            <label asp-for="Location" class="col-form-label col-lg-3 col-sm-12">
+                Loaction<span class="text-danger">*</span> :
+            </label>
+            <div class="col-lg-5 col-md-9 col-sm-12">
+                <input asp-for="Location" class="form-control">
+                <span asp-validation-for="Location" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="form-group row mb-2">
+            <label asp-for="EstimatiedPickUpDate" class="col-form-label col-lg-3 col-sm-12">
+                EstimatiedPickUpDate<span class="text-danger">*</span> :
+            </label>
+            <div class="col-lg-5 col-md-9 col-sm-12">
+                <input asp-for="EstimatiedPickUpDate" class="form-control" type="date">
+                <span asp-validation-for="EstimatiedPickUpDate" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div id="editorRows">
+            <h5>Donate Item:</h5>
+            @foreach (var item in Model.Donations)
+            {
+                <partial name="_DonationItem" asp-for="item" />
+            }
+            <a id="addItem" asp-action="BlankItem" asp-controller="PickUp">Add Item</a>
+
+        </div>
+
+        <div class="form-group">
+            <input id="submit" type="submit" value="Create" class="btn btn-primary" />
+        </div>
+    </form>
+</div>
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section scripts {
+    <script>
+        $("#submit").click(function (e) {
+            e.preventDefault();
+            var formData = new FormData();
+
+            $("input[name='Location']").each(function (i) {
+                var Location = $(this).val();
+                formData.append("vm.Location", Location);
+
+            });
+            $("input[name='EstimatiedPickUpDate']").each(function (i) {
+                var EstimatiedPickUpDate = $(this).val();
+                formData.append("vm.EstimatiedPickUpDate", EstimatiedPickUpDate);
+
+            });
+            $("input[name='ItemName']").each(function (i) {
+                var ItemName = $(this).val();
+                formData.append("vm.Donations[" + i + "].ItemName", ItemName);
+
+            });
+            $("input[name='Quantity']").each(function (i) {
+                var Quantity = $(this).val();
+                formData.append("vm.Donations[" + i + "].Quantity", Quantity);
+
+            });
+
+            $.ajax({
+                method: 'post',
+                url: "/PickUp/Create",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function () {
+
+                }
+            });
+
+        });
+
+        $("#addItem").click(function () {
+            $.ajax({
+                url: this.href,
+                cache: false,
+                success: function (html) {
+                    $("#editorRows").append(html);
+                    $(".deleteRow").click(function () {
+                        $(this).parents("div.editorRow:first").remove();
+                        return false;
+                    });
+                }
+            });
+            return false;
+        });
+
+        
+    </script>
+}

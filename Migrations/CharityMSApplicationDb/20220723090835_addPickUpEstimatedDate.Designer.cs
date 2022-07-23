@@ -4,14 +4,16 @@ using CharityMS.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace CharityMS.Migrations.CharityMSApplicationDb
 {
     [DbContext(typeof(CharityMSApplicationDbContext))]
-    partial class CharityMSApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220723090835_addPickUpEstimatedDate")]
+    partial class addPickUpEstimatedDate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -51,7 +53,7 @@ namespace CharityMS.Migrations.CharityMSApplicationDb
                     b.Property<Guid?>("PickUpId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("Quantity")
+                    b.Property<int>("Quanlity")
                         .HasColumnType("int");
 
                     b.HasKey("Id");

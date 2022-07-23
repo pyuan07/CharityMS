@@ -18,6 +18,8 @@ namespace CharityMS.Models
 
         public string Location { get; set; }
 
+        public DateTime EstimatedPickUpDate { get; set; }
+
         public DateTime PickUpDate { get; set; }
 
         public List<Item> Donations { get; set; }

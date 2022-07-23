@@ -1,0 +1,56 @@
+﻿@model CharityMS.ViewModels.PickUpDetailVM
+@{
+    ViewData["Title"] = "Details";
+}
+
+<div class="container">
+    <h1>Details</h1>
+
+    <h1>Dog Picture Gallery: </h1>
+    <br />
+    <div>
+        @{ int index = 0;}
+        @foreach (var image in Model.images)
+        {
+            string url = "https://" + image.BucketName + ".s3.amazonaws.com/" + image.Key;
+            <div>
+                <img src="@url" width="200" height="200" />
+            </div>
+            index++;
+        }
+    </div>
+
+    <div class="form-group row mb-2">
+        <label asp-for="Location" class="col-form-label col-lg-3 col-sm-12">
+            Loaction<span class="text-danger">*</span> :
+        </label>
+        <div class="col-lg-5 col-md-9 col-sm-12">
+            <input asp-for="Location" class="form-control">
+            <span asp-validation-for="Location" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="form-group row mb-2">
+        <label asp-for="EstimatiedPickUpDate" class="col-form-label col-lg-3 col-sm-12">
+            EstimatiedPickUpDate<span class="text-danger">*</span> :
+        </label>
+        <div class="col-lg-5 col-md-9 col-sm-12">
+            <input asp-for="EstimatiedPickUpDate" class="form-control" type="date">
+            <span asp-validation-for="EstimatiedPickUpDate" class="text-danger"></span>
+        </div>
+    </div>
+
+    @*<div id="editorRows">
+        <h5>Donate Item:</h5>
+        @foreach (var item in Model.Donations)
+        {
+            <partial name="_DonationItem" asp-for="item" />
+        }
+        <a id="addItem" asp-action="BlankItem" asp-controller="PickUp">Add Item</a>
+
+    </div>*@
+
+    <div class="form-group">
+        <input id="submit" type="submit" value="Create" class="btn btn-primary" />
+    </div>
+</div>

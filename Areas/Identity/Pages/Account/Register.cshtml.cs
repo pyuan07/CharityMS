@@ -63,6 +63,10 @@ namespace CharityMS.Areas.Identity.Pages.Account
             public string Address { get; set; }
 
             [Required]
+            [Display(Name = "Contact Phone Number")]
+            public string PhoneNumber { get; set; }
+
+            [Required]
             [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
             [DataType(DataType.Password)]
             [Display(Name = "Password")]
@@ -93,6 +97,7 @@ namespace CharityMS.Areas.Identity.Pages.Account
                     Address = Input.Address,
                     FullName = Input.FullName,
                     NormalizedUserName = Input.FullName,
+                    PhoneNumber = Input.PhoneNumber,
                     EmailConfirmed = true
                 };
                 var result = await _userManager.CreateAsync(user, Input.Password);

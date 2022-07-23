@@ -1,0 +1,93 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject UserManager<CharityMS.Areas.Identity.Data.User> UserManager
+
+@model IEnumerable<CharityMS.Areas.Identity.Data.User>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Index</h1>
+
+<form asp-action="Index">
+    <div class="input-group mb-3">
+        <select class="form-select form-control" id="filter-role">
+            <option selected value="">Please select a Role to Filter</option>
+            <option value="User">User</option>
+            <option value="Staff">Staff</option>
+        </select>
+        <button type="button" class="btn  btn-outline-secondary" onclick="onFilter()" style="width:150px">Filter</button>
+    </div>
+</form>
+
+
+<p>
+    <a class="btn btn-primary" asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.FullName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Email)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PhoneNumber)
+            </th>
+            <th>
+                Role
+            </th>
+            <th>
+                Action
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FullName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Email)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PhoneNumber)
+                </td>
+                <td>
+                    @UserManager.GetRolesAsync(item).Result.FirstOrDefault()
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts{
+
+    <script type="text/javascript">
+
+         $(document).ready(function () {
+
+            var successMsg = "@Html.Raw(TempData["successMsg"])";
+            if (successMsg)
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Congratulations',
+                    text: successMsg
+                })
+         })
+
+        function onFilter() {
+            location.href = '@Url.Action("Index","Users")'+'?role=' + $("#filter-role").val();
+        }
+    </script>
+
+}

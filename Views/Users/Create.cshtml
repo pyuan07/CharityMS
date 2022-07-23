@@ -1,0 +1,128 @@
+﻿@model CharityMS.ViewModels.UserVM
+
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Create</h1>
+
+<h4>User</h4>
+<hr />
+<div>
+    <form id="createForm" asp-action="Create">
+
+        <div class="form-group row mb-2">
+            <label asp-for="Email" class="col-form-label col-lg-3 col-sm-12">
+                Email<span class="text-danger">*</span> :
+            </label>
+            <div class="col-lg-5 col-md-9 col-sm-12">
+                <input asp-for="Email" class="form-control">
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="form-group row mb-2">
+            <label asp-for="Password" class="col-form-label col-lg-3 col-sm-12">
+                Password<span class="text-danger">*</span> :
+            </label>
+            <div class="col-lg-5 col-md-9 col-sm-12">
+                <input asp-for="Password" class="form-control">
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="form-group row mb-2">
+            <label asp-for="ConfirmPassword" class="col-form-label col-lg-3 col-sm-12">
+                ConfirmPassword<span class="text-danger">*</span> :
+            </label>
+            <div class="col-lg-5 col-md-9 col-sm-12">
+                <input asp-for="ConfirmPassword" class="form-control">
+                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="form-group row mb-2">
+            <label asp-for="FullName" class="col-form-label col-lg-3 col-sm-12">
+                FullName<span class="text-danger">*</span> :
+            </label>
+            <div class="col-lg-5 col-md-9 col-sm-12">
+                <input asp-for="FullName" class="form-control">
+                <span asp-validation-for="FullName" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="form-group row mb-2">
+            <label asp-for="PhoneNumber" class="col-form-label col-lg-3 col-sm-12">
+                Phone Number<span class="text-danger">*</span> :
+            </label>
+            <div class="col-lg-5 col-md-9 col-sm-12">
+                <input asp-for="PhoneNumber" class="form-control">
+                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="form-group row mb-2">
+            <label asp-for="Role" class="col-form-label col-lg-3 col-sm-12">
+                Role<span class="text-danger">*</span> :
+            </label>
+            <div class="col-lg-5 col-md-9 col-sm-12">
+                <select asp-for="Role" asp-items="Model.UserRoles" required class="form-control" id="select-role">
+                    <option selected disabled> Select a Role </option>
+                </select>
+                <span asp-validation-for="Role" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div id="address_textfield" class="form-group row mb-2" style="display:none">
+            <label asp-for="Address" class="col-form-label col-lg-3 col-sm-12">
+                Address<span class="text-danger">*</span> :
+            </label>
+            <div class="col-lg-5 col-md-9 col-sm-12">
+                <textarea asp-for="Address" class="form-control" rows="2" id="address-input"></textarea>
+                <span asp-validation-for="Address" class="text-danger"></span>
+            </div>
+        </div>
+
+        @*<div class="form-group row mb-2">
+            <label asp-for="Address" class="col-form-label col-lg-3 col-sm-12">
+                Address<span class="text-danger">*</span> :
+            </label>
+            <div class="col-lg-5 col-md-9 col-sm-12">
+                <input asp-for="Address" class="form-control">
+                <span asp-validation-for="Address" class="text-danger"></span>
+            </div>
+        </div>*@
+
+        <div class="form-group">
+            <input type="submit" value="Create" class="btn btn-primary" />
+        </div>
+    </form>
+</div>
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+
+@section Scripts{
+
+    <script type="text/javascript">
+
+         $(document).ready(function () {
+             $('#select-role').change(function () {
+                 var item = $(this);
+                 if (item.val() == 'User') {
+                     $("#address_textfield").show();
+                     $("#address-input").prop("disabled", false);
+                 }
+                 else {
+                     $("#address_textfield").hide();
+                     $("#address-input").prop("disabled", true);
+                 }
+            });
+         })
+
+
+    </script>
+
+}

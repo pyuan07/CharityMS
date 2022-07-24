@@ -11,12 +11,9 @@
 <h1>Insert Inventory Form:</h1>
 <br />
 <br />
-<div style="background-color:lightcyan;margin-top:10px;margin-bottom:10px;padding:12px 12px 12px 12px">
     <form method="post" asp-action="InsertInventory">
-
-        <div class="card" style="background-color:lightblue; padding:12px;">
             <div class="form-field">
-                <div class="row">
+                <div class="row mb-3">
                     <div class="col-md-2">
                         <label>Donor Name:</label>
                     </div>
@@ -26,16 +23,16 @@
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row mb-3">
                     <div class="col-md-2">
                         <label>Category:</label>
                     </div>
                     <div class="col-md-5">
-                        <select asp-for="Category" asp-items="@Model.Categories" class="form-control" id="catTxt" onchange="categoryOnChange()"></select>
+                        <select asp-for="Category" asp-items="@Model.Categories" class="form-select" id="catTxt" onchange="categoryOnChange()"></select>
                         <span asp-validation-for="Category" class="text-danger"></span>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row mb-3">
                     <div class="col-md-2">
                         <label>Item Name:</label>
                     </div>
@@ -44,7 +41,7 @@
                         <span asp-validation-for="Name" class="text-danger"></span>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row mb-3">
                     <div class="col-md-2">
                         <label>Quantity:</label>
                     </div>
@@ -53,7 +50,8 @@
                         <span asp-validation-for="Quantity" class="text-danger"></span>
                     </div>
                 </div>
-                <div class="row" style="display:none" id="expiredDate">
+
+                <div class="row mb-3" style="display:none" id="expiredDateDiv">
                     <div class="col-md-2">
                         <label>ExpiredDate:</label>
                     </div>
@@ -62,7 +60,7 @@
                         <span asp-validation-for="ExpiredDate" class="text-danger"></span>
                     </div>
                 </div>
-                <div class="row" style="display:none" id="condition">
+                <div class="row mb-3" style="display:none" id="condition">
                     <div class="col-md-2">
                         <label>Condition:</label>
                     </div>
@@ -71,7 +69,7 @@
                         <span asp-validation-for="ProductCondition" class="text-danger"></span>
                     </div>
                 </div>
-                <div class="row" style="display:none" id="size">
+                <div class="row mb-3" style="display:none" id="size">
                     <div class="col-md-2">
                         <label>Clothe Size:</label>
                     </div>
@@ -82,13 +80,12 @@
                 </div>
 
             </div>
-            <div class="col-md-2">
-                <button class="btn btn-primary" type="submit">Update</button>
+            <div class="col-md-7">
+                <button class="btn btn-primary btn-block" type="submit">Update</button>
+                <a asp-action="InventoryList" class="btn btn-secondary btn-block">Back</a>
             </div>
 
-        </div>
     </form>
-</div>
 
 
 @section Scripts{
@@ -99,19 +96,19 @@
             var cat = document.getElementById('catTxt').value
             console.log(cat)
             if (cat == "food" || cat == "beverage") {
-                document.getElementById('expiredDate').style.display = 'block';
+                document.getElementById('expiredDateDiv').style.display = 'block';
                 document.getElementById('condition').style.display = 'none';
                 document.getElementById('size').style.display = 'none';
             } else if (cat == "electronics") {
-                document.getElementById('ExpiredDate').style.display = 'none';
+                document.getElementById('expiredDateDiv').style.display = 'none';
                 document.getElementById('condition').style.display = 'block';
                 document.getElementById('size').style.display = 'none';
             } else if (cat == "clothe") {
-                document.getElementById('ExpiredDate').style.display = 'none';
+                document.getElementById('expiredDateDiv').style.display = 'none';
                 document.getElementById('condition').style.display = 'none';
                 document.getElementById('size').style.display = 'block';
             } else {
-                document.getElementById('ExpiredDate').style.display = 'none';
+                document.getElementById('expiredDateDiv').style.display = 'none';
                 document.getElementById('condition').style.display = 'none';
                 document.getElementById('size').style.display = 'none';
             }

@@ -99,7 +99,7 @@ namespace CharityMS.Areas.Identity.Pages.Account.Manage
             }
 
             if (Input.Address != user.Address) user.Address = Input.Address;
-            if (Input.FullName != user.Address) user.Address = Input.FullName;
+            if (Input.FullName != user.FullName) user.FullName = Input.FullName;
 
             var updateResult = await _userManager.UpdateAsync(user);
             if (!updateResult.Succeeded)

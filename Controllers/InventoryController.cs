@@ -15,25 +15,20 @@ namespace CharityMS.Controllers
 {
     public class InventoryController : Controller
     {
-        //setup the table name
         private const string tableName = "inventorytp057978";
 
-        //function 1: how to get the connection info from the appsettings.json
         private List<string> getCredentialInfo()
         {
-            //1. how to link to the appsettings.json
             var builder = new ConfigurationBuilder()
                             .SetBasePath(Directory.GetCurrentDirectory())
                             .AddJsonFile("appsettings.json");
-            IConfigurationRoot configure = builder.Build(); //build the json file
+            IConfigurationRoot configure = builder.Build(); 
 
-            //2. read the info from json using configure instance
             List<string> KeyList = new List<string>();
             KeyList.Add(configure["AWSCredential:key1"]); //access key
             KeyList.Add(configure["AWSCredential:key2"]); //secret key
             KeyList.Add(configure["AWSCredential:key3"]); //session token
 
-            //3. return keys to function that needed
             return KeyList;
         }
 
@@ -43,15 +38,12 @@ namespace CharityMS.Controllers
             return View();
         }
 
-        //function 2: learn how to create a table in DynamoDB using code
         public async Task<IActionResult> createTable()
         {
-            //1. make connection using the keys
             List<string> KeyList = getCredentialInfo();
             var DynamoDbclientobject = new AmazonDynamoDBClient(KeyList[0], KeyList[1], KeyList[2], RegionEndpoint.USEast1);
 
             string message = "";
-            //2. start build the table
             try
             {
                 var createTableRequest = new CreateTableRequest
@@ -62,24 +54,24 @@ namespace CharityMS.Controllers
                     {
                         new AttributeDefinition
                         {
-                            AttributeName = "DonorID", //order request
+                            AttributeName = "DonorID", 
                             AttributeType = "S"
                         },
                         new AttributeDefinition
                         {
-                            AttributeName = "InventoryID", //order request
+                            AttributeName = "InventoryID", 
                             AttributeType = "S"
                         }
                     },
 
                     KeySchema = new List<KeySchemaElement>()
                     {
-                        new KeySchemaElement //who should be the partition key
+                        new KeySchemaElement 
                         {
                             AttributeName = "DonorID",
                             KeyType = "HASH"
                         },
-                        new KeySchemaElement //who should be the sort key
+                        new KeySchemaElement 
                         {
                             AttributeName = "InventoryID",
                             KeyType = "RANGE"
@@ -108,29 +100,29 @@ namespace CharityMS.Controllers
             return RedirectToAction("Index", "Inventory", new { msg = message });
         }
 
-        public IActionResult InsertInventory(string msg = "") //form
+        public IActionResult InsertInventory(string msg = "") 
         {
             ViewBag.msg = msg;
             return View(new InventoryVM());
         }
 
-        //function 4: learn how to get the data input and put into the DynamoDB table
+       
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> InsertInventory(InventoryVM vm)
         {
-            //1. make connection using the keys
+            
             List<string> KeyList = getCredentialInfo();
             var DynamoDbclientobject = new AmazonDynamoDBClient(KeyList[0], KeyList[1], KeyList[2], RegionEndpoint.USEast1);
 
-            //2. create a variable so that it can capture all the values and convert to become a document type JSON writing
+            
             Dictionary<string, AttributeValue> documentRecord = new Dictionary<string, AttributeValue>();
             string message = "";
 
-            //3. starting to convert and send to the DynamoDB table
+            
             try
             {
-                //how to do the static attribute
+                
                 documentRecord["DonorID"] = new AttributeValue { S = vm.DonorID };
                 documentRecord["InventoryID"] = new AttributeValue { S = Guid.NewGuid().ToString() };
                 documentRecord["Product_Name"] = new AttributeValue { S = vm.Name };
@@ -146,11 +138,18 @@ namespace CharityMS.Controllers
                         documentRecord["Expierd_Date"] = new AttributeValue { S = vm.ExpiredDate.ToString() };
                     }
                 }
-                else
+                else if(vm.Category=="electronics")
                 {
                     if (!string.IsNullOrEmpty(vm.ProductCondition))
                     {
                         documentRecord["Product_Condition"] = new AttributeValue { S = vm.ProductCondition };
+                    }
+                }
+                else if (vm.Category == "clothe")
+                {
+                    if (!string.IsNullOrEmpty(vm.cloteSize))
+                    {
+                        documentRecord["Clothe_Size"] = new AttributeValue { S = vm.cloteSize };
                     }
                 }
 
@@ -175,50 +174,50 @@ namespace CharityMS.Controllers
             return RedirectToAction("InsertInventory", "Inventory", new { msg = message });
         }
 
-        //function 5: Learn how to do a scan search for searching the data based on payment amount
-        public async Task<IActionResult> InventoryListAsync(string msg = "") //form
+        
+        public async Task<IActionResult> InventoryListAsync(string msg = "") 
         {
-            //1. make connection using the keys
+            
             List<string> KeyList = getCredentialInfo();
             var DynamoDbclientobject = new AmazonDynamoDBClient(KeyList[0], KeyList[1], KeyList[2], RegionEndpoint.USEast1);
 
-            //2. create variables - to help on converting the document type to become string type
-            List<Document> returnRecords = new List<Document>(); //reading content direct from table
-            List<KeyValuePair<string, string>> singleConvertedRecord = new List<KeyValuePair<string, string>>(); //convert single doc
-            List<List<KeyValuePair<string, string>>> fullList = new List<List<KeyValuePair<string, string>>>(); // final collection
+            
+            List<Document> returnRecords = new List<Document>(); 
+            List<KeyValuePair<string, string>> singleConvertedRecord = new List<KeyValuePair<string, string>>(); 
+            List<List<KeyValuePair<string, string>>> fullList = new List<List<KeyValuePair<string, string>>>();
             string message = "";
 
-            //3. starting to collect the result from the table
+            
             try
             {
-                //step 1: create statement /process for full scan and filter(condition - optional) data in side the table
+                
                 ScanFilter scanprice = new ScanFilter();
 
-                //step 2: bring the statement attach to the query and connection
+                
                 Table customerTransactions = Table.LoadTable(DynamoDbclientobject, tableName);
-                Search search = customerTransactions.Scan(scanprice); //keep search sentence
+                Search search = customerTransactions.Scan(scanprice); 
 
 
                 do
                 {
-                    returnRecords = await search.GetNextSetAsync(); //execute the query
+                    returnRecords = await search.GetNextSetAsync(); 
 
-                    if (returnRecords.Count == 0) //data not found!
+                    if (returnRecords.Count == 0)
                     {
                         ViewBag.msg = "Record is not found! ";
                         return View(fullList);
                     }
 
-                    //if data found, time to converting the data from document item to string type
+                   
                     foreach (var singlerecord in returnRecords)
                     {
-                        foreach (var attributeKey in singlerecord.GetAttributeNames()) //read all the attributes in single item
+                        foreach (var attributeKey in singlerecord.GetAttributeNames()) 
                         {
                             string attributeValue = "";
 
-                            if (singlerecord[attributeKey] is DynamoDBBool) //change the type from document type to real string type
+                            if (singlerecord[attributeKey] is DynamoDBBool) 
                                 attributeValue = singlerecord[attributeKey].AsBoolean().ToString();
-                            else if (singlerecord[attributeKey] is Primitive) //change the type from document type to real string type
+                            else if (singlerecord[attributeKey] is Primitive) 
                                 attributeValue = singlerecord[attributeKey].AsPrimitive().Value.ToString();
                             else if (singlerecord[attributeKey] is PrimitiveList)
                                 attributeValue = string.Join(",", (from primitive
@@ -267,6 +266,9 @@ namespace CharityMS.Controllers
                             case "Inventory_Status":
                                 vm.Status = i.Value;
                                 break;
+                            case "Clothe_Size":
+                                vm.Status = i.Value;
+                                break;
                         }
                     }
                     vmList.Add(vm);
@@ -286,54 +288,54 @@ namespace CharityMS.Controllers
             return View();
         }
 
-        //function 6: learn how to scan the data and display to the screen
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> InventoryList(string category)
+        public async Task<IActionResult> InventoryList(string category, string status, string pruductName)
         {
-            //1. make connection using the keys
+            
             List<string> KeyList = getCredentialInfo();
             var DynamoDbclientobject = new AmazonDynamoDBClient(KeyList[0], KeyList[1], KeyList[2], RegionEndpoint.USEast1);
 
-            //2. create variables - to help on converting the document type to become string type
-            List<Document> returnRecords = new List<Document>(); //reading content direct from table
-            List<KeyValuePair<string, string>> singleConvertedRecord = new List<KeyValuePair<string, string>>(); //convert single doc
-            List<List<KeyValuePair<string, string>>> fullList = new List<List<KeyValuePair<string, string>>>(); // final collection
+            
+            List<Document> returnRecords = new List<Document>(); 
+            List<KeyValuePair<string, string>> singleConvertedRecord = new List<KeyValuePair<string, string>>(); 
+            List<List<KeyValuePair<string, string>>> fullList = new List<List<KeyValuePair<string, string>>>();
             string message = "";
 
-            //3. starting to collect the result from the table
             try
             {
-                //step 1: create statement /process for full scan and filter(condition - optional) data in side the table
                 ScanFilter scanprice = new ScanFilter();
                 if (!String.IsNullOrEmpty(category))
                     scanprice.AddCondition("Inventory_Category", ScanOperator.Contains, category);
+                if (!String.IsNullOrEmpty(pruductName))
+                    scanprice.AddCondition("Product_Name", ScanOperator.Contains, pruductName);
+                if (!String.IsNullOrEmpty(status))
+                    scanprice.AddCondition("Inventory_Status", ScanOperator.Contains, status);
 
-                //step 2: bring the statement attach to the query and connection
                 Table customerTransactions = Table.LoadTable(DynamoDbclientobject, tableName);
-                Search search = customerTransactions.Scan(scanprice); //keep search sentence
+                Search search = customerTransactions.Scan(scanprice);
                     
 
                 do
                 {
-                    returnRecords = await search.GetNextSetAsync(); //execute the query
+                    returnRecords = await search.GetNextSetAsync();
 
-                    if (returnRecords.Count == 0) //data not found!
+                    if (returnRecords.Count == 0)
                     {
                         ViewBag.msg = "Record is not found! ";
-                        return View(fullList);
+                        return View(new List<InventoryVM>());
                     }
 
-                    //if data found, time to converting the data from document item to string type
                     foreach (var singlerecord in returnRecords)
                     {
-                        foreach (var attributeKey in singlerecord.GetAttributeNames()) //read all the attributes in single item
+                        foreach (var attributeKey in singlerecord.GetAttributeNames())
                         {
                             string attributeValue = "";
 
-                            if (singlerecord[attributeKey] is DynamoDBBool) //change the type from document type to real string type
+                            if (singlerecord[attributeKey] is DynamoDBBool)
                                 attributeValue = singlerecord[attributeKey].AsBoolean().ToString();
-                            else if (singlerecord[attributeKey] is Primitive) //change the type from document type to real string type
+                            else if (singlerecord[attributeKey] is Primitive) 
                                 attributeValue = singlerecord[attributeKey].AsPrimitive().Value.ToString();
                             else if (singlerecord[attributeKey] is PrimitiveList)
                                 attributeValue = string.Join(",", (from primitive
@@ -383,6 +385,9 @@ namespace CharityMS.Controllers
                             case "Inventory_Status":
                                 vm.Status = i.Value;
                                 break;
+                            case "Clothe_Size":
+                                vm.Status = i.Value;
+                                break;
                         }
                     }
                     vmList.Add(vm);
@@ -429,13 +434,13 @@ namespace CharityMS.Controllers
 
                 foreach (var singlerecord in singleReturnRecordItem)
                 {
-                    foreach (var attributeKey in singlerecord.GetAttributeNames()) //read all the attributes in single item
+                    foreach (var attributeKey in singlerecord.GetAttributeNames())
                     {
                         string attributeValue = "";
 
-                        if (singlerecord[attributeKey] is DynamoDBBool) //change the type from document type to real string type
+                        if (singlerecord[attributeKey] is DynamoDBBool)
                             attributeValue = singlerecord[attributeKey].AsBoolean().ToString();
-                        else if (singlerecord[attributeKey] is Primitive) //change the type from document type to real string type
+                        else if (singlerecord[attributeKey] is Primitive)
                             attributeValue = singlerecord[attributeKey].AsPrimitive().Value.ToString();
                         else if (singlerecord[attributeKey] is PrimitiveList)
                             attributeValue = string.Join(",", (from primitive
@@ -481,22 +486,22 @@ namespace CharityMS.Controllers
                     case "Inventory_Status":
                         vm.Status = i.Value;
                         break;
+                    case "Clothe_Size":
+                        vm.Status = i.Value;
+                        break;
                 }
             }
 
             return View(vm);
         }
 
-        //nineth function: how to update the data from the edit form to DynamoDB
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> updateData(InventoryVM vm)
         {
-            //1. make connection using the keys
             List<string> KeyList = getCredentialInfo();
             
             var DynamoDbclientobject = new AmazonDynamoDBClient(KeyList[0], KeyList[1], KeyList[2], RegionEndpoint.USEast1);
-            string message = "";
             
             List<KeyValuePair<string, AttributeValue>> updateListItem = new List<KeyValuePair<string, AttributeValue>>();
             updateListItem.Add(new KeyValuePair<string, AttributeValue>("Quantity", new AttributeValue { N = vm.Quantity }));
@@ -509,6 +514,10 @@ namespace CharityMS.Controllers
             if (!string.IsNullOrEmpty(vm.ProductCondition))
             {
                 updateListItem.Add(new KeyValuePair<string, AttributeValue>("Product_Condition", new AttributeValue { S = vm.ProductCondition }));
+            }
+            if (!string.IsNullOrEmpty(vm.cloteSize))
+            {
+                updateListItem.Add(new KeyValuePair<string, AttributeValue>("Clothe_Size", new AttributeValue { S = vm.cloteSize }));
             }
 
             foreach (var singleAttribute in updateListItem)
@@ -537,11 +546,9 @@ namespace CharityMS.Controllers
         
         public async Task<IActionResult> deleteInventory(string donorId, string inventoryId)
         {
-            //1. make connection using the keys
             List<string> KeyList = getCredentialInfo();
 
             var DynamoDbclientobject = new AmazonDynamoDBClient(KeyList[0], KeyList[1], KeyList[2], RegionEndpoint.USEast1);
-            string message = "";
 
             var request = new DeleteItemRequest
             {

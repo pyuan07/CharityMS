@@ -8,68 +8,113 @@
     <script>alert("@ViewBag.msg");</script>
 }
 
-    <h1>Insert Inventory Form:</h1>
-    <br />
-    <br />
-    <div style="background-color:lightcyan;margin-top:10px;margin-bottom:10px;padding:12px 12px 12px 12px">
-        <form method="post" asp-action="InsertInventory">
-            <div class="card" style="background-color:lightblue; padding:12px;">
-                <div class="form-field">
-                    <div class="row">
-                        <div class="col-md-2">
-                            <label>Donor Name:</label>
-                        </div>
-                        <div class="col-md-5">
-                            <input type="text" asp-for="DonorID" value="@Model.DonorID"  />
-                        </div>
+<h1>Insert Inventory Form:</h1>
+<br />
+<br />
+<div style="background-color:lightcyan;margin-top:10px;margin-bottom:10px;padding:12px 12px 12px 12px">
+    <form method="post" asp-action="InsertInventory">
+        <div class="card" style="background-color:lightblue; padding:12px;">
+            <div class="form-field">
+                <div class="row">
+                    <div class="col-md-2">
+                        <label>Donor Name:</label>
                     </div>
-
-                    <div class="row">
-                        <div class="col-md-2">
-                            <label>Category:</label>
-                        </div>
-                        <div class="col-md-5">
-                            <select asp-for="Category" asp-items="@Model.Categories" class="form-control" ></select>
-                        </div>
+                    <div class="col-md-5">
+                        <input type="text" asp-for="DonorID" value="@Model.DonorID" class="form-control" />
+                        <span asp-validation-for="DonorID" class="text-danger"></span>
                     </div>
-                    <div class="row">
-                        <div class="col-md-2">
-                            <label>Item Name:</label>
-                        </div>
-                        <div class="col-md-5">
-                            <input type="text" asp-for="Name" value="@Model.Name" />
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-2">
-                            <label>Quantity:</label>
-                        </div>
-                        <div class="col-md-5">
-                            <input type="number" asp-for="Quantity" value="@Model.Quantity" />
-                        </div>
-                    </div>
-                        <div class="row">
-                            <div class="col-md-2">
-                                <label>ExpiredDate:</label>
-                            </div>
-                            <div class="col-md-5">
-                                <input type="date" asp-for="@Model.ExpiredDate" />
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-2">
-                                <label>Condition:</label>
-                            </div>
-                            <div class="col-md-5">
-                                <select asp-for="ProductCondition" asp-items="@Model.Conditions" class="form-control"></select>
-                            </div>
-                        </div>
-
                 </div>
-                <div class="col-md-2">
-                    <button class="btn btn-primary" type="submit">Update</button>
+
+                <div class="row">
+                    <div class="col-md-2">
+                        <label>Category:</label>
+                    </div>
+                    <div class="col-md-5">
+                        <select asp-for="Category" asp-items="@Model.Categories" class="form-control" id="catTxt" onchange="categoryOnChange()"></select>
+                        <span asp-validation-for="Category" class="text-danger"></span>
+                    </div>
                 </div>
-                
+                <div class="row">
+                    <div class="col-md-2">
+                        <label>Item Name:</label>
+                    </div>
+                    <div class="col-md-5">
+                        <input type="text" asp-for="Name" value="@Model.Name" class="form-control" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-2">
+                        <label>Quantity:</label>
+                    </div>
+                    <div class="col-md-5">
+                        <input type="number" asp-for="Quantity" value="@Model.Quantity" class="form-control" />
+                        <span asp-validation-for="Quantity" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row" style="display:none" id="expiredDate">
+                    <div class="col-md-2">
+                        <label>ExpiredDate:</label>
+                    </div>
+                    <div class="col-md-5">
+                        <input type="date" asp-for="@Model.ExpiredDate" class="form-control" />
+                        <span asp-validation-for="ExpiredDate" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row" style="display:none" id="condition">
+                    <div class="col-md-2">
+                        <label>Condition:</label>
+                    </div>
+                    <div class="col-md-5">
+                        <select asp-for="ProductCondition" asp-items="@Model.Conditions" class="form-control"></select>
+                        <span asp-validation-for="ProductCondition" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row" style="display:none" id="size">
+                    <div class="col-md-2">
+                        <label>Clothe Size:</label>
+                    </div>
+                    <div class="col-md-5">
+                        <select asp-for="cloteSize" asp-items="@Model.clothSizes" class="form-control"></select>
+                        <span asp-validation-for="cloteSize" class="text-danger"></span>
+                    </div>
+                </div>
+
             </div>
-        </form>
-    </div>
+            <div class="col-md-2">
+                <button class="btn btn-primary" type="submit">Update</button>
+            </div>
+
+        </div>
+    </form>
+</div>
+
+
+@section Scripts{
+
+    <script type="text/javascript">
+
+        function categoryOnChange() {
+            var cat = document.getElementById('catTxt').value
+            console.log(cat)
+            if (cat == "food" || cat == "beverage") {
+                document.getElementById('expiredDate').style.display = 'block';
+                document.getElementById('condition').style.display = 'none';
+                document.getElementById('size').style.display = 'none';
+            } else if (cat == "electronics") {
+                document.getElementById('ExpiredDate').style.display = 'none';
+                document.getElementById('condition').style.display = 'block';
+                document.getElementById('size').style.display = 'none';
+            } else if (cat == "clothe") {
+                document.getElementById('ExpiredDate').style.display = 'none';
+                document.getElementById('condition').style.display = 'none';
+                document.getElementById('size').style.display = 'block';
+            } else {
+                document.getElementById('ExpiredDate').style.display = 'none';
+                document.getElementById('condition').style.display = 'none';
+                document.getElementById('size').style.display = 'none';
+            }
+        }
+    </script>
+
+}

@@ -7,10 +7,12 @@
 
 @if (ViewBag.msg != "")
 {
-    <script>alert("@ViewBag.msg");</script>
+    <script>
+        alert("@ViewBag.msg");
+    </script>
 }
 
-<a asp-action="InsertInventory">Add Record to Inventory Table</a>
+<a class="btn btn-primary" asp-action="InsertInventory">Add Record</a>
 
 <div class="container">
     <br />
@@ -18,10 +20,10 @@
     <form method="post" asp-action="InventoryList">
         <div class="row">
             <div class="col-md-1">
-                <label>Product Name: </label>
+                <label>Item Name: </label>
             </div>
             <div class="col-md-2">
-                <input type="text" name="pruductName" />
+                <input type="text" name="itemName" />
             </div>
             <div class="col-md-1">
                 <label>Category: </label>
@@ -61,7 +63,6 @@
         <br />
         <p>Number of the transaction found in this search result : @Model.Count</p>
         <div class="row">
-            @{ string donorId = "", inventoryId = "";}
             @foreach (var item in Model)
             {
             <div style="display:inline-block; background-color: lightblue; text-align:left; margin:10px 10px 10px 10px; padding:12px 12px 12px 12px" class="col-md-4">
@@ -156,12 +157,86 @@
                         <select asp-for="@item.Status" asp-items="@item.Statusddl" class="form-control" disabled></select>
                     </div>
                 </div>
-                <a asp-action="updateInventory" asp-controller="Inventory" asp-route-donorId="@item.DonorID" asp-route-inventoryId="@item.InventoryID"><button class=" btn btn-info">Edit</button></a>
+                <a asp-action="updateInventory" asp-controller="Inventory" asp-route-donorId="@item.DonorID" asp-route-inventoryId="@item.InventoryID" class="btn btn-info">Edit</a>
                 &nbsp;
-                <a asp-action="deleteInventory" asp-controller="Inventory" asp-route-donorId="@item.DonorID" asp-route-inventoryId="@item.InventoryID"><button class="btn btn-danger">Delete</button></a>
-                <a asp-action="Donate" asp-controller="Inventory" asp-route-donorId="@item.DonorID" asp-route-inventoryId="@item.InventoryID" asp-route-receiverName="hello"><button class="btn btn-success">Donate</button></a>
+                <a asp-action="deleteInventory" asp-controller="Inventory" asp-route-donorId="@item.DonorID" asp-route-inventoryId="@item.InventoryID" class="btn btn-danger">Delete</a>
+                &nbsp;
+                @*<a asp-action="Donate" asp-controller="Inventory" asp-route-donorId="@item.DonorID" asp-route-inventoryId="@item.InventoryID" asp-route-receiverName="hello" class="btn btn-success">Donate</a>*@
+                @if (item.Status != "Donated")
+                {
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#createModal_@item.InventoryID">
+                        Donate
+                    </button>
+
+                    <div class="modal fade" id="createModal_@item.InventoryID" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="createModalLabel">Donations</h5>
+                                    <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <form id="donateForm">
+                                    <div class="modal-body">
+                                        <div class="form-group mb-3">
+                                            <label class="form-label">Receiver</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" required id="receiver-txt_@item.InventoryID">
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        @*<a asp-action="Donate" asp-controller="Inventory" asp-route-donorId="@item.DonorID" asp-route-inventoryId="@item.InventoryID" asp-route-receiverName="hello" class="btn btn-success">Donate</a>*@
+                                        <button type="button" class="btn btn-primary" onclick="onDonate('@item.DonorID','@item.InventoryID')">Donate</button>
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                }
             </div>
             }
         </div>
     }
 </div>
+
+@section Scripts{
+    <script type="text/javascript">
+        //trigger when loaded
+        $(document).ready(function () {
+
+            var errorMsg = "@ViewBag.ErrorMsg";
+
+            if (errorMsg)
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Opps...',
+                    text: errorMsg
+                })
+
+            var successMsg = "@Html.Raw(TempData["successMsg"])";
+
+            if (successMsg)
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Congratulations',
+                    text: successMsg
+                })
+
+            var errorTempMsg = "@Html.Raw(TempData["errorMsg"])";
+
+            if (errorTempMsg)
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Opps...',
+                    text: errorTempMsg
+                })
+
+        })
+
+        function onDonate(donor, inv) {
+            location.href = '@Url.Action("Donate", "Inventory")' + '?donorId=' + donor + '&inventoryId=' + inv + '&receiverName=' + $('#receiver-txt_' + inv).val();
+        }
+    </script>
+}

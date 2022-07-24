@@ -42,19 +42,16 @@ namespace CharityMS.Controllers
 
         private List<string> getCredentialInfo()
         {
-            //1. how to link to the appsettings.json
             var builder = new ConfigurationBuilder()
                             .SetBasePath(Directory.GetCurrentDirectory())
                             .AddJsonFile("appsettings.json");
-            IConfigurationRoot configure = builder.Build(); //build the json file
+            IConfigurationRoot configure = builder.Build(); 
 
-            //2. read the info from json using configure instance
             List<string> KeyList = new List<string>();
             KeyList.Add(configure["AWSCredential:key1"]); //access key
             KeyList.Add(configure["AWSCredential:key2"]); //secret key
             KeyList.Add(configure["AWSCredential:key3"]); //session token
 
-            //3. return keys to function that needed
             return KeyList;
         }
 
@@ -81,7 +78,6 @@ namespace CharityMS.Controllers
                 return View(vm);
         }
 
-        // GET: UserController/Details/5
         public async Task<IActionResult> Details(Guid? id)
         {
             if (id == null)
@@ -113,27 +109,24 @@ namespace CharityMS.Controllers
                 List<string> KeyList = getCredentialInfo();
                 var s3clientobject = new AmazonS3Client(KeyList[0], KeyList[1], KeyList[2], RegionEndpoint.USEast1);
 
-                List<S3Object> s3imageList = new List<S3Object>(); //use for storing the images objects to the frontend
+                List<S3Object> s3imageList = new List<S3Object>();
 
-                //2. start to collect the images 1 by 1 from the S3
                 try
                 {
-                    //create token - next marker info
                     string token = null;
                     do
                     {
-                        ListObjectsRequest request = new ListObjectsRequest() //read the items form the bucket now
+                        ListObjectsRequest request = new ListObjectsRequest()
                         {
                             BucketName = bucketname,
                             Prefix= "prove/" + id.ToString()+"/",
                             Delimiter="/"
                         };
-                        ListObjectsResponse response = await s3clientobject.ListObjectsAsync(request).ConfigureAwait(false); //return response from s3
+                        ListObjectsResponse response = await s3clientobject.ListObjectsAsync(request).ConfigureAwait(false); 
                         s3imageList.AddRange(response.S3Objects);
-                        token = response.NextMarker; // to determine whether still have next item in s3 or not
+                        token = response.NextMarker; 
                     } while (token != null);
 
-                    ViewBag.PreSignedURLList = getPreSignedURL(s3imageList, s3clientobject);
                 }
                 catch (Exception ex)
                 {
@@ -146,7 +139,6 @@ namespace CharityMS.Controllers
             return View(vm);
         }
 
-        // GET: UserController/Create
         public ActionResult Create()
         {
             PickUpVM vm = new PickUpVM();
@@ -159,7 +151,6 @@ namespace CharityMS.Controllers
             return PartialView("_DonationItem", new DonationItemVM());
         }
 
-        // POST: UserController/Create
         [HttpPost]
         public async Task<IActionResult> CreateAsync(PickUpVM vm)
         {
@@ -192,7 +183,6 @@ namespace CharityMS.Controllers
             return RedirectToAction("Index", "PickUp");
         }
 
-        //GET: UserController/Edit/5
         public async Task<IActionResult> Edit(Guid? id)
         {
             if (id == null)
@@ -224,27 +214,24 @@ namespace CharityMS.Controllers
                 List<string> KeyList = getCredentialInfo();
                 var s3clientobject = new AmazonS3Client(KeyList[0], KeyList[1], KeyList[2], RegionEndpoint.USEast1);
 
-                List<S3Object> s3imageList = new List<S3Object>(); //use for storing the images objects to the frontend
+                List<S3Object> s3imageList = new List<S3Object>();
 
-                //2. start to collect the images 1 by 1 from the S3
                 try
                 {
-                    //create token - next marker info
                     string token = null;
                     do
                     {
-                        ListObjectsRequest request = new ListObjectsRequest() //read the items form the bucket now
+                        ListObjectsRequest request = new ListObjectsRequest()
                         {
                             BucketName = bucketname,
                             Prefix = "prove/" + id.ToString() + "/",
                             Delimiter = "/"
                         };
-                        ListObjectsResponse response = await s3clientobject.ListObjectsAsync(request).ConfigureAwait(false); //return response from s3
+                        ListObjectsResponse response = await s3clientobject.ListObjectsAsync(request).ConfigureAwait(false); 
                         s3imageList.AddRange(response.S3Objects);
-                        token = response.NextMarker; // to determine whether still have next item in s3 or not
+                        token = response.NextMarker;
                     } while (token != null);
 
-                    ViewBag.PreSignedURLList = getPreSignedURL(s3imageList, s3clientobject);
                 }
                 catch (Exception ex)
                 {
@@ -257,7 +244,6 @@ namespace CharityMS.Controllers
             return View(vm);
         }
 
-        // POST: UserController/Edit/5
         [HttpPost]
         public async Task<IActionResult> EditAsync(Guid id, PickUpVM vm)
         {
@@ -290,7 +276,6 @@ namespace CharityMS.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // POST: UserController/Delete/5
         public async Task<IActionResult> Delete(Guid id)
         {
             try
@@ -308,25 +293,25 @@ namespace CharityMS.Controllers
                 List<string> KeyList = getCredentialInfo();
                 var s3clientobject = new AmazonS3Client(KeyList[0], KeyList[1], KeyList[2], RegionEndpoint.USEast1);
 
-                List<S3Object> s3imageList = new List<S3Object>(); //use for storing the images objects to the frontend
+                List<S3Object> s3imageList = new List<S3Object>();
 
                 string token = null;
                 do
                 {
-                    ListObjectsRequest request = new ListObjectsRequest() //read the items form the bucket now
+                    ListObjectsRequest request = new ListObjectsRequest()
                     {
                         BucketName = bucketname,
                         Prefix = "prove/" + id.ToString() + "/",
                         Delimiter = "/"
                     };
-                    ListObjectsResponse response = await s3clientobject.ListObjectsAsync(request).ConfigureAwait(false); //return response from s3
+                    ListObjectsResponse response = await s3clientobject.ListObjectsAsync(request).ConfigureAwait(false);
                     s3imageList.AddRange(response.S3Objects);
-                    token = response.NextMarker; // to determine whether still have next item in s3 or not
+                    token = response.NextMarker;
                 } while (token != null);
 
                 foreach(var i in s3imageList)
                 {
-                    var deleteObjectRequest = new DeleteObjectRequest //setup the request details
+                    var deleteObjectRequest = new DeleteObjectRequest
                     {
                         BucketName = bucketname,
                         Key = i.Key,
@@ -350,15 +335,13 @@ namespace CharityMS.Controllers
             return View();
         }
 
-        //update status with prove
         [HttpPost]
         public async Task<IActionResult> UpdateStatusProve(Guid id,List<IFormFile> images)
         {
             List<string> KeyList = getCredentialInfo();
             var s3clientobject = new AmazonS3Client(KeyList[0], KeyList[1], KeyList[2], RegionEndpoint.USEast1);
 
-            string filename = ""; //collecting the filename for display in msg
-            //2. upload images one by one
+            string filename = "";
             foreach (var image in images)
             {
                 //2.1 small input validation
@@ -376,16 +359,14 @@ namespace CharityMS.Controllers
                     return BadRequest(image.FileName + "is not a valid picture for uploading! Please change the file!");
                 }
 
-                //2.2 all passed then start sending to the S3 bucket
                 try
                 {
-                    //a. create the upload request for the S3
                     PutObjectRequest uploadRequest = new PutObjectRequest
                     {
-                        InputStream = image.OpenReadStream(), //what is the source file
-                        BucketName = bucketname + "/prove/"+id.ToString(), //bucket path or bucket with folder path
-                        Key = image.FileName, //object name
-                        CannedACL = S3CannedACL.PublicRead //open to display in any browser
+                        InputStream = image.OpenReadStream(),
+                        BucketName = bucketname + "/prove/"+id.ToString(),
+                        Key = image.FileName,
+                        CannedACL = S3CannedACL.PublicRead
                     };
 
                     //b. execute your request command
@@ -409,42 +390,22 @@ namespace CharityMS.Controllers
                 new { msg = "Images of " + filename + " already uploaded to the S3" });
         }
 
-        public List<string> getPreSignedURL(List<S3Object> s3imageList, AmazonS3Client s3clientobject)
-        {
-            List<string> PreSignedURLList = new List<string>();
-
-            foreach (var image in s3imageList)
-            {
-                // Create a get the PreSigned URL request
-                GetPreSignedUrlRequest request = new GetPreSignedUrlRequest
-                {
-                    BucketName = image.BucketName,
-                    Key = image.Key,
-                    Expires = DateTime.Now.AddMinutes(1)
-                };
-                PreSignedURLList.Add(s3clientobject.GetPreSignedURL(request));
-            }
-            return PreSignedURLList;
-        }
-
         public async Task<IActionResult> deleteImage(string filename, string pid)
         {
-            //1. make connection
             List<string> KeyList = getCredentialInfo();
             var s3clientobject = new AmazonS3Client(KeyList[0], KeyList[1], KeyList[2], RegionEndpoint.USEast1);
 
-            //2. start deleting the image
             string message = "";
 
-            try // need to edit later for deleting action!
+            try
             {
-                var deleteObjectRequest = new DeleteObjectRequest //setup the request details
+                var deleteObjectRequest = new DeleteObjectRequest
                 {
                     BucketName = bucketname,
                     Key = filename,
                 };
 
-                await s3clientobject.DeleteObjectAsync(deleteObjectRequest); //execute the request in S3
+                await s3clientobject.DeleteObjectAsync(deleteObjectRequest);
                 message = filename + " is successfully deleted from the S3 Bucket!";
             }
             catch (AmazonS3Exception ex)

@@ -71,6 +71,18 @@
                         </div>
                     }
 
+                    @if (Model.cloteSize != null)
+                    {
+                        <div class="row">
+                            <div class="col-md-2">
+                                <label>Clothe Size:</label>
+                            </div>
+                            <div class="col-md-5">
+                                <select asp-for="cloteSize" asp-items="@Model.clothSizes" class="form-control"></select>
+                            </div>
+                        </div>
+                    }
+
 
                     <div class="row">
                         <div class="col-md-2">

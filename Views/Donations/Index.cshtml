@@ -1,0 +1,107 @@
+﻿@model IEnumerable<CharityMS.ViewModels.DonationVM>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="CreateRequest">Create New Request</a>
+    <a asp-action="CheckRequest">Check Requests</a>
+
+</p>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ReceiverFullName)
+            </th>
+            <th style="width:500px">
+                @Html.DisplayNameFor(model => model.Donations)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Date)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Status)
+            </th>
+            <th>
+                Action
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.ReceiverFullName)
+            </td>
+            <td>
+                @if (item.Donations != null)
+                {
+                    @string.Join(", ", item.Donations);
+                }
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Date)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Status)
+            </td>
+            <td>
+                <a class="btn btn-info" asp-action="Details" asp-route-id="@item.Id">Details</a>
+                @if (item.Status == "received")
+                {
+                    <button type="button" class="btn btn-primary" asp-action="ReceivedDonation" disabled asp-route-id="@item.Id">Received</button>
+                }
+                else
+                {
+                    <a class="btn btn-primary" asp-action="ReceivedDonation" asp-route-id="@item.Id">Received</a>
+                }
+            </td>
+        </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts{
+    <script type="text/javascript">
+        //trigger when loaded
+        $(document).ready(function () {
+
+            var errorMsg = "@ViewBag.ErrorMsg";
+
+            if (errorMsg)
+                Swal.fire({
+                    icon: 'errpr',
+                    title: 'Opps...',
+                    text: errorMsg
+                })
+
+            var successMsg = "@Html.Raw(TempData["successMsg"])";
+
+            if (successMsg)
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Congratulations',
+                    text: successMsg
+                })
+
+            var errorTempMsg = "@Html.Raw(TempData["errorMsg"])";
+
+            if (errorTempMsg)
+                Swal.fire({
+                    icon: 'errpr',
+                    title: 'Opps...',
+                    text: errorTempMsg
+                })
+
+        })
+
+    </script>
+}

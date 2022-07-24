@@ -15,6 +15,7 @@ using Amazon.S3; //s3 bucket
 using System.IO; //file reading
 using Amazon; //S3 account location
 using Microsoft.Extensions.Configuration; //link to the appsettings.json - get info key
+using System.Security.Claims;
 
 namespace CharityMS.Controllers
 {
@@ -25,8 +26,6 @@ namespace CharityMS.Controllers
         private readonly CharityMSdbContext _indentityContext;
         private readonly CharityMSApplicationDbContext _context;
 
-        private readonly string staffId = "07df0a49-2de5-4ce0-b9f8-010d3230caaf";
-        private readonly string donorId = "05e94752-51ac-4ad3-acef-5a7eac1ddea8";
         private readonly string bucketname = "charitymstp057978";
 
         public PickUpController(
@@ -143,6 +142,8 @@ namespace CharityMS.Controllers
         {
             PickUpVM vm = new PickUpVM();
             vm.Donations = new List<Item>();
+            vm.EstimatiedPickUpDate = DateTime.Now;
+            vm.Location = _userManager.GetUserId(HttpContext.User) != null ? _userManager.GetUserAsync(HttpContext.User).Result.Address : "";
             return View(vm);
         }
 
@@ -154,19 +155,21 @@ namespace CharityMS.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateAsync(PickUpVM vm)
         {
+            ResultMessageModel resultMessageModel = new ResultMessageModel();
+
             if (!ModelState.IsValid)
             {
+                resultMessageModel.Result = -1;
+                resultMessageModel.Message = "Invalid Data";
                 ModelState.AddModelError(string.Empty, "Invalid Data");
-                return View(vm);
+                return Json(resultMessageModel);
             }
 
             try
             {
-                User donor = _indentityContext.Users.FirstOrDefault(m => m.Id.Equals(donorId));
-
                 var pickUp = new PickUp
                 {
-                    DonorId = Guid.Parse(donor.Id),
+                    DonorId = User.FindFirstValue(ClaimTypes.NameIdentifier) != null ? Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)) : Guid.Empty,
                     Location = vm.Location,
                     EstimatedPickUpDate = vm.EstimatiedPickUpDate,
                     Status = "Registed",
@@ -175,12 +178,19 @@ namespace CharityMS.Controllers
 
                 _context.PickUp.Add(pickUp);
                 _context.SaveChanges();
-            }catch(Exception ex)
+                resultMessageModel.Result = 0;
+                resultMessageModel.Message = "Create Pick-up Successfully";
+
+            }
+            catch(Exception ex)
             {
+                resultMessageModel.Result = -1;
+                resultMessageModel.Message = "Some error occured when creating ! "+ ex.Message;
+
                 ex.StackTrace.ToString();
             }
 
-            return RedirectToAction("Index", "PickUp");
+            return Json(resultMessageModel);
         }
 
         public async Task<IActionResult> Edit(Guid? id)
@@ -377,7 +387,7 @@ namespace CharityMS.Controllers
 
                     pu.Status = "Picked-Up";
                     pu.PickUpDate = DateTime.Now;
-                    pu.StaffId = Guid.Parse(staffId);
+                    pu.StaffId = User.FindFirstValue(ClaimTypes.NameIdentifier) != null ? Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)) : Guid.Empty;
                     _context.SaveChanges();
                 }
                 catch (Exception ex)
@@ -395,7 +405,7 @@ namespace CharityMS.Controllers
             List<string> KeyList = getCredentialInfo();
             var s3clientobject = new AmazonS3Client(KeyList[0], KeyList[1], KeyList[2], RegionEndpoint.USEast1);
 
-            string message = "";
+            ResultMessageModel resultMessageModel = new ResultMessageModel();
 
             try
             {
@@ -406,17 +416,22 @@ namespace CharityMS.Controllers
                 };
 
                 await s3clientobject.DeleteObjectAsync(deleteObjectRequest);
-                message = filename + " is successfully deleted from the S3 Bucket!";
+                resultMessageModel.Result = 0;
+                resultMessageModel.Message = filename + " is successfully deleted from the S3 Bucket!";
             }
             catch (AmazonS3Exception ex)
             {
-                message = "Error in deleting the " + filename + " : " + ex.Message;
+                resultMessageModel.Result = -1;
+                resultMessageModel.Message = "Error in deleting the " + filename + " : " + ex.Message;
             }
             catch (Exception ex)
             {
-                message = "Error in deleting the " + filename + " : " + ex.Message;
+                resultMessageModel.Result = -1;
+                resultMessageModel.Message = "Error in deleting the " + filename + " : " + ex.Message;
             }
-            return RedirectToAction("Edit", "PickUp", new { id = Guid.Parse(pid) });
+
+            return Json(resultMessageModel);
+            //return RedirectToAction("Edit", "PickUp", new { id = Guid.Parse(pid) });
         }
     }
 }

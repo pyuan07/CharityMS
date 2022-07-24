@@ -25,19 +25,24 @@
                 EstimatiedPickUpDate<span class="text-danger">*</span> :
             </label>
             <div class="col-lg-5 col-md-9 col-sm-12">
-                <input asp-for="EstimatiedPickUpDate" class="form-control" type="date">
+                <input asp-for="EstimatiedPickUpDate" class="form-control" type="date" min="@DateTime.Now">
                 <span asp-validation-for="EstimatiedPickUpDate" class="text-danger"></span>
             </div>
         </div>
 
-        <div id="editorRows">
-            <h5>Donate Item:</h5>
-            @foreach (var item in Model.Donations)
-            {
-                <partial name="_DonationItem" asp-for="item" />
-            }
-            <a id="addItem" asp-action="BlankItem" asp-controller="PickUp">Add Item</a>
-
+        <div class="card mb-2">
+            <div class="card-header">
+                Request Item <span class="text-danger">*</span> :
+            </div>
+            <div class="card-body">
+                <div id="editorRows">
+                    @foreach (var item in Model.Donations)
+                    {
+                        <partial name="_DonationItem" asp-for="item" />
+                    }
+                </div>
+                <a id="addItem" asp-controller="Donations" asp-action="BlankItem" class="btn btn-primary btn-sm">Add Item</a>
+            </div>
         </div>
 
         <div class="form-group">
@@ -82,8 +87,23 @@
                 data: formData,
                 processData: false,
                 contentType: false,
-                success: function () {
-
+                 success: function (data) {
+                    if (data.Result == -1) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: data.message
+                        })
+                    }
+                    else {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Congratulations',
+                            text: data.message
+                        }).then(function () {
+                            location.href = '@Url.Action("Index", "PickUp")';
+                        });
+                    }
                 }
             });
 
@@ -104,6 +124,6 @@
             return false;
         });
 
-        
+
     </script>
 }

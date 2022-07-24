@@ -45,13 +45,15 @@
                 @Html.DisplayFor(modelItem => item.Status)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Id)
-            </td>
-            <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.Id">Details</a>|
-                <a asp-action="UpdateStatusProve" asp-route-id="@item.Id">Pick Up</a>|
-                <a asp-action="Delete" asp-controller="PickUp" asp-route-id="@item.Id">Delete</a>
+                <a asp-action="UpdateStatusProve" asp-route-id="@item.Id">Pick Up</a>
+                @if (item.Status != "Picked-Up")
+                {
+                    <label>|</label>
+                    <a asp-action="Delete" asp-controller="PickUp" asp-route-id="@item.Id">Delete</a>
+                }
+
             </td>
         </tr>
         }

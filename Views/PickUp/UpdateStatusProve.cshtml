@@ -9,10 +9,11 @@
           enctype="multipart/form-data">
         <input type="hidden" name="id" value="@ViewBag.id" />
         <label>Upload multiple images from here: </label>
-        <input type="File" name="images" accept="image/*" multiple />
+        <input class="form-control-file" type="File" name="images" accept="image/*" multiple />
         <br />
         <br />
-        <input type="submit" value="Upload File" />
+        <input class="btn btn-primary" type="submit" value="Upload File" />
+        <a asp-action="Index" class="btn btn-secondary">Back</a>
     </form>
 </div>
 

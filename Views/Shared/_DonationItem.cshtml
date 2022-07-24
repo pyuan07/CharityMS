@@ -1,9 +1,9 @@
 ﻿@model CharityMS.ViewModels.DonationItemVM
 <div class="editorRow mb-2">
 
-    <span>Item Name: </span> @Html.EditorFor(m => m.ItemName, new { @class = "form-control" })
+    <span>Item Name: </span> @Html.EditorFor(m => m.ItemName, new { @class = "form-control" , @required = "required" })
     &emsp;
-    <span>Quantity: </span> @Html.EditorFor(m => m.Quantity, new { @class = "form-control" })
+    <span>Quantity: </span> @Html.EditorFor(m => m.Quantity, new { @class = "form-control", @required = "required" })
     &emsp;
     <button class="btn-sm btn btn-primary deleteRow" type="button">Delete</button>
 </div>

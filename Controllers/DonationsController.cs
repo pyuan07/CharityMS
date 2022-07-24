@@ -18,6 +18,7 @@ using Amazon;
 using CharityMS.ViewModels;
 using Microsoft.CodeAnalysis;
 using Microsoft.VisualStudio.Web.CodeGeneration.Contracts.Messaging;
+using System.Security.Claims;
 
 namespace CharityMS.Controllers
 {
@@ -226,7 +227,7 @@ namespace CharityMS.Controllers
                     Reason = donationRequest.Reason,
                     ReceiverId = donationRequest.ReceiverId,
                     Date = DateTime.Now,
-                    StaffId = _userManager.GetUserId(HttpContext.User) != null ? Guid.Parse(_userManager.GetUserId(HttpContext.User)) : Guid.NewGuid(),
+                    StaffId = User.FindFirstValue(ClaimTypes.NameIdentifier) != null ? Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)) : Guid.Empty,
                     Status = answer
                 };
 
@@ -314,7 +315,7 @@ namespace CharityMS.Controllers
             ResultMessageModel json = new ResultMessageModel();
 
             donation.Id = Guid.NewGuid();
-            donation.ReceiverId = _userManager.GetUserId(HttpContext.User) != null ? Guid.Parse(_userManager.GetUserId(HttpContext.User)) : Guid.NewGuid();
+            donation.ReceiverId = User.FindFirstValue(ClaimTypes.NameIdentifier) != null ? Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)) : Guid.Empty;
 
             #region Send Message Queue to SQS
             //connection
@@ -372,7 +373,7 @@ namespace CharityMS.Controllers
                 return View(donation);
             }
 
-            donation.StaffId = _userManager.GetUserId(HttpContext.User) != null ? Guid.Parse(_userManager.GetUserId(HttpContext.User)) : Guid.NewGuid();
+            donation.StaffId = User.FindFirstValue(ClaimTypes.NameIdentifier) != null ? Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)) : Guid.Empty;
 
             _context.Add(donation);
             await _context.SaveChangesAsync();

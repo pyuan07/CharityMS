@@ -1,0 +1,175 @@
+﻿@model CharityMS.ViewModels.DonationRequest
+
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Request Donation</h1>
+
+<hr />
+<div class="row">
+
+    <center><h5>Approximate Number of Queue for Donations: @ViewBag.QueueCount</h5></center>
+
+    <form asp-action="CreateRequest" class="mt-5">
+
+        <div class="form-group row mb-3">
+            <label asp-for="ApplicantName" class="col-form-label col-lg-3 col-sm-12">
+                Applicant Name:
+            </label>
+            <div class="col-lg-5 col-md-9 col-sm-12">
+                <input readonly asp-for="ApplicantName" id="applicant-textfield" class="form-control" value="@ViewBag.UserFullname" />
+                <span asp-validation-for="ApplicantName" class="text-danger"></span>
+            </div>
+        </div>
+
+
+        <div class="card mb-3">
+            <div class="card-header">
+                Request Item:
+            </div>
+            <div class="card-body">
+                <div id="editorRows">
+                    @foreach (var item in Model.Donations)
+                    {
+                        <partial name="_DonationItem" asp-for="item" />
+                    }
+                </div>
+                <a id="addItem" asp-controller="Donations" asp-action="BlankItem" class="btn btn-primary btn-sm">Add Item</a>
+            </div>
+        </div>
+
+
+        <div class="form-group row mb-3">
+            <label asp-for="Reason" class="col-form-label col-lg-3 col-sm-12">
+                Reason<span class="text-danger">*</span> :
+            </label>
+            <div class="col-lg-5 col-md-9 col-sm-12">
+                <textarea asp-for="Reason" id="reason-textfield" class="form-control" rows="2"></textarea>
+                <span asp-validation-for="Reason" class="text-danger"></span>
+            </div>
+        </div>
+
+
+        <div class="form-group mt-3">
+            <input id="submit" type="submit" value="Create" class="btn btn-primary" />
+        </div>
+    </form>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@*<div class="modal fade" id="createModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createModalLabel">Create New Donation Item</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="itemForm">
+                <div class="modal-body">
+                    <div class="form-group mb-3">
+                        <label class="form-label">Item Name</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" required">
+                        </div>
+
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label class="form-label">Item Quantity</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" required">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <input type="submit" class="btn btn-primary" value="Create">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>*@
+
+@section Scripts {
+    <script>
+        //trigger when loaded
+        $(document).ready(function () {
+            var errorMsg = "@ViewBag.errorMsg";
+
+            if (errorMsg)
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Opps...',
+                    text: errorMsg
+                })
+        })
+
+        $("#submit").click(function (e) {
+            e.preventDefault();
+            var formData = new FormData();
+
+            formData.append("donation.Reason", $("#reason-textfield").val());
+            formData.append("donation.ApplicantName", $("#applicant-textfield").val());
+
+            
+            $("input[name='ItemName']").each(function (i) {
+                var ItemName = $(this).val();
+                formData.append("donation.Donations[" + i + "].ItemName", ItemName);
+            });
+
+            $("input[name='Quantity']").each(function (i) {
+                var Quantity = $(this).val();
+                formData.append("donation.Donations[" + i + "].Quantity", Quantity);
+            });
+
+            $.ajax({
+                method: 'post',
+                url: "/Donations/CreateRequest",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    if (data.Result == -1) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: data.message
+                        })
+                    }
+                    else {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Congratulations',
+                            text: data.message
+                        }).then(function () {
+                            location.href = '@Url.Action("Index", "Donations")';
+                        });
+                    }
+                }
+            });
+
+        });
+
+        $("#addItem").click(function () {
+            $.ajax({
+                url: this.href,
+                cache: false,
+                success: function (html) {
+                    $("#editorRows").append(html);
+                    $(".deleteRow").click(function () {
+                        $(this).parents("div.editorRow:first").remove();
+                        return false;
+                    });
+                }
+            });
+            return false;
+        });
+
+
+    </script>
+}

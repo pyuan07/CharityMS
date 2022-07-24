@@ -11,13 +11,14 @@ namespace CharityMS.Models
     {
         [Key]
         public Guid Id { get; set; }
+        public Guid ReceiverId { get; set; }
+        public List<Item> Donations { get; set; }
 
-        public string ReceiverName;
+        public string Reason { get; set; }
 
+        public string Status { get; set; }
         public Guid StaffId { get; set; }
-
         public DateTime Date { get; set; }
 
-        public List<Item> Donations { get; set; }
     }
 }

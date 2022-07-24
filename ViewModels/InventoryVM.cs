@@ -31,6 +31,8 @@ namespace CharityMS.ViewModels
 
         public string cloteSize { get; set; }
 
+        public string Receiver { get; set; }
+
         [Required]
         public string Status { get; set; }
 

@@ -136,6 +136,18 @@
                     </div>
                 }
 
+                @if (!String.IsNullOrEmpty(@item.Receiver))
+                {
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label>Receiver:</label>
+                        </div>
+                        <div class="col-md-9">
+                            <input type="text" asp-for="@item.Receiver" disabled />
+                        </div>
+                    </div>
+                }
+
                 <div class="row">
                     <div class="col-md-3">
                         <label>Status:</label>
@@ -144,9 +156,10 @@
                         <select asp-for="@item.Status" asp-items="@item.Statusddl" class="form-control" disabled></select>
                     </div>
                 </div>
-                <a asp-action="updateInventory" asp-controller="Inventory" asp-route-donorId="@donorId" asp-route-inventoryId="@inventoryId"><button class=" btn btn-info">Edit</button></a>
+                <a asp-action="updateInventory" asp-controller="Inventory" asp-route-donorId="@item.DonorID" asp-route-inventoryId="@item.InventoryID"><button class=" btn btn-info">Edit</button></a>
                 &nbsp;
-                <a asp-action="deleteInventory" asp-controller="Inventory" asp-route-donorId="@donorId" asp-route-inventoryId="@inventoryId"><button class="btn btn-danger">Delete</button></a>
+                <a asp-action="deleteInventory" asp-controller="Inventory" asp-route-donorId="@item.DonorID" asp-route-inventoryId="@item.InventoryID"><button class="btn btn-danger">Delete</button></a>
+                <a asp-action="Donate" asp-controller="Inventory" asp-route-donorId="@item.DonorID" asp-route-inventoryId="@item.InventoryID" asp-route-receiverName="hello"><button class="btn btn-success">Donate</button></a>
             </div>
             }
         </div>

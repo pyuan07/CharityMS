@@ -5,7 +5,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Request Donation</h1>
+<h1>Request Donations</h1>
 
 <hr />
 <div class="row">
@@ -27,7 +27,7 @@
 
         <div class="card mb-3">
             <div class="card-header">
-                Request Item:
+                Request Item <span class="text-danger">*</span> :
             </div>
             <div class="card-body">
                 <div id="editorRows">
@@ -43,11 +43,10 @@
 
         <div class="form-group row mb-3">
             <label asp-for="Reason" class="col-form-label col-lg-3 col-sm-12">
-                Reason<span class="text-danger">*</span> :
+                Reason:
             </label>
             <div class="col-lg-5 col-md-9 col-sm-12">
                 <textarea asp-for="Reason" id="reason-textfield" class="form-control" rows="2"></textarea>
-                <span asp-validation-for="Reason" class="text-danger"></span>
             </div>
         </div>
 

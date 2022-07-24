@@ -21,17 +21,17 @@
                         <img src="@url" width="400" height="300" />
                     </div>
                 </div>
-                <input type="hidden" id="key1" value="@image.Key" />
+                <input type="hidden" id="key-@index" value="@image.Key" />
                 <div class="card-footer">
-                    <button type="button" onClick="deleteImage()" class="btn btn-danger">Delete</button>
+                    <button type="button" onClick="deleteImage(@index)" class="btn btn-danger">Delete</button>
                 </div>
                 index++;
             }
         </div>
     }
 <form id="updateForm" asp-action="Edit" method="post">
-    <input type="hidden" id="pid" value="@Model.Id" />
-    <input type="hidden" id="status" value="@Model.Id" />
+    <input type="hidden" asp-for="Id" id="pid" value="@Model.Id" />
+    <input type="hidden" asp-for="Status" id="status" value="@Model.Status" />
     <div class="form-group row mb-2">
         <label asp-for="Location" class="col-form-label col-lg-3 col-sm-12">
             Loaction<span class="text-danger">*</span> :
@@ -53,7 +53,7 @@
         </div>
     </div>
 
-    <div class="form-group row mb-2">
+    @*<div class="form-group row mb-2">
         <label asp-for="PickUpDate" class="col-form-label col-lg-3 col-sm-12">
             PickUpDate<span class="text-danger">*</span> :
         </label>
@@ -61,26 +61,62 @@
             <input asp-for="PickUpDate" class="form-control" type="date">
             <span asp-validation-for="PickUpDate" class="text-danger"></span>
         </div>
-    </div>
+    </div>*@
 
-    <div id="editorRows">
-        <h5>Donate Item:</h5>
-        @foreach (var item in Model.Donations)
-        {
-            <div class="row">
-                <div class="col-md-3">
-                    <span>Item Name: </span> <input asp-for="@item.ItemName" class="form-control" type="text">
+    @*<div id="editorRows">
+            <h5>Donate Item:</h5>
+            @foreach (var item in Model.Donations)
+            {
+                <div class="row">
+                    <div class="col-md-3">
+                        <span>Item Name: </span> <input asp-for="@item.ItemName" class="form-control" type="text">
+                    </div>
+                    <div class="col-md-3">
+                        <span>Quantity: </span> <input asp-for="@item.Quantity" class="form-control" type="number">
+                    </div>
                 </div>
-                <div class="col-md-3">
-                    <span>Quantity: </span> <input asp-for="@item.Quantity" class="form-control" type="number">
-                </div>
-            </div>
-        }
+            }
+        </div>*@
 
+    <div class="row">
+        <div class="col-lg-3 col-sm-12">
+            Donation Items:
+        </div>
+        <div class="col-lg-5 col-md-9 col-sm-12">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>
+                            Item Name
+                        </th>
+                        <th>
+                            Item Quantity
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Donations != null)
+                    {
+                        @foreach (var item in Model.Donations)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.ItemName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Quantity)
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <div class="form-group">
         <input id="submit" type="submit" value="Update" class="btn btn-primary" />
+        <a asp-action="Index" class="btn btn-secondary">Back</a>
     </div>
 </form>
 </div>
@@ -89,14 +125,30 @@
     {
     <script>
 
-        function deleteImage() {
-            var fn = document.getElementById("key1").value;
+        function deleteImage(index) {
+            console.log(index);
+            var fn = document.getElementById("key-" + index).value;
             var pid = document.getElementById("pid").value;
             $.ajax({
                 url: "/PickUp/deleteImage",
                 data: { filename: fn, pid: pid },
-                success: function () {
-                    
+                success: function (data) {
+                    if (data.Result == -1) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: data.Message
+                        })
+                    }
+                    else {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Congratulations',
+                            text: data.Message
+                        }).then(function () {
+                            location.href = '@Url.Action("Edit", "PickUp")';
+                        });
+                    }
                 }
             });
         }

@@ -25,21 +25,33 @@
                         @*<li class="nav-item">
             <a class="nav-link text-dark" asp-area="" asp-controller="Pickup" asp-action="Index">Pick Up</a>
         </li>*@
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Index">User List</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Inventory" asp-action="InventoryList">Inventory</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="PickUp" asp-action="Index">Pick Up</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Donations" asp-action="Index">Donation</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Donations" asp-action="CreateRequest">Request Donation</a>
-                        </li>
+                        @if (User.IsInRole("Staff"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Index">User List</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Inventory" asp-action="InventoryList">Inventory</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="PickUp" asp-action="Index">Pick Up</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Donations" asp-action="Index">Donation</a>
+                            </li>
+                        }
+                        @if (User.IsInRole("User"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="PickUp" asp-action="Index">Pick Up</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Donations" asp-action="Index">Donation</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Donations" asp-action="CreateRequest">Request Donation</a>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>

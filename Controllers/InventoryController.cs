@@ -122,44 +122,45 @@ namespace CharityMS.Controllers
             
             try
             {
-                
-                documentRecord["DonorID"] = new AttributeValue { S = vm.DonorID };
-                documentRecord["InventoryID"] = new AttributeValue { S = Guid.NewGuid().ToString() };
-                documentRecord["Product_Name"] = new AttributeValue { S = vm.Name };
-                documentRecord["Quantity"] = new AttributeValue { N = vm.Quantity.ToString() };
-                documentRecord["Inventory_Category"] = new AttributeValue { S = vm.Category };
-                documentRecord["Inventory_Status"] = new AttributeValue { S = "Available" };
+                for (int i = 0; i < int.Parse(vm.Quantity); i++)
+                {
+                    documentRecord["DonorID"] = new AttributeValue { S = vm.DonorID };
+                    documentRecord["InventoryID"] = new AttributeValue { S = Guid.NewGuid().ToString() };
+                    documentRecord["Product_Name"] = new AttributeValue { S = vm.Name };
+                    documentRecord["Inventory_Category"] = new AttributeValue { S = vm.Category };
+                    documentRecord["Inventory_Status"] = new AttributeValue { S = "Available" };
 
-                //dynamic structure for the attribute section
-                if (vm.Category == "food" || vm.Category == "beverage")
-                {
-                    if (!string.IsNullOrEmpty(vm.ExpiredDate.ToString()))
+                    //dynamic structure for the attribute section
+                    if (vm.Category == "food" || vm.Category == "beverage")
                     {
-                        documentRecord["Expierd_Date"] = new AttributeValue { S = vm.ExpiredDate.ToString() };
+                        if (!string.IsNullOrEmpty(vm.ExpiredDate.ToString()))
+                        {
+                            documentRecord["Expierd_Date"] = new AttributeValue { S = vm.ExpiredDate.ToString() };
+                        }
                     }
-                }
-                else if(vm.Category=="electronics")
-                {
-                    if (!string.IsNullOrEmpty(vm.ProductCondition))
+                    else if (vm.Category == "electronics")
                     {
-                        documentRecord["Product_Condition"] = new AttributeValue { S = vm.ProductCondition };
+                        if (!string.IsNullOrEmpty(vm.ProductCondition))
+                        {
+                            documentRecord["Product_Condition"] = new AttributeValue { S = vm.ProductCondition };
+                        }
                     }
-                }
-                else if (vm.Category == "clothe")
-                {
-                    if (!string.IsNullOrEmpty(vm.cloteSize))
+                    else if (vm.Category == "clothe")
                     {
-                        documentRecord["Clothe_Size"] = new AttributeValue { S = vm.cloteSize };
+                        if (!string.IsNullOrEmpty(vm.cloteSize))
+                        {
+                            documentRecord["Clothe_Size"] = new AttributeValue { S = vm.cloteSize };
+                        }
                     }
-                }
 
-                PutItemRequest request = new PutItemRequest
-                {
-                    TableName = tableName,
-                    Item = documentRecord
-                };
+                    PutItemRequest request = new PutItemRequest
+                    {
+                        TableName = tableName,
+                        Item = documentRecord
+                    };
 
-                await DynamoDbclientobject.PutItemAsync(request);
+                    await DynamoDbclientobject.PutItemAsync(request);
+                }
                 message = "Donation from of user - " + vm.DonorID + " is added to the Inventory table now! ";
             }
             catch (AmazonDynamoDBException ex)
@@ -260,8 +261,8 @@ namespace CharityMS.Controllers
                             case "Product_Name":
                                 vm.Name = i.Value;
                                 break;
-                            case "Quantity":
-                                vm.Quantity = i.Value;
+                            case "Receiver_Name":
+                                vm.Receiver = i.Value;
                                 break;
                             case "Inventory_Status":
                                 vm.Status = i.Value;
@@ -379,8 +380,8 @@ namespace CharityMS.Controllers
                             case "Product_Name":
                                 vm.Name = i.Value;
                                 break;
-                            case "Quantity":
-                                vm.Quantity = i.Value;
+                            case "Receiver_Name":
+                                vm.Receiver = i.Value;
                                 break;
                             case "Inventory_Status":
                                 vm.Status = i.Value;
@@ -480,14 +481,14 @@ namespace CharityMS.Controllers
                     case "Product_Name":
                         vm.Name = i.Value;
                         break;
-                    case "Quantity":
-                        vm.Quantity = i.Value;
-                        break;
                     case "Inventory_Status":
                         vm.Status = i.Value;
                         break;
                     case "Clothe_Size":
                         vm.Status = i.Value;
+                        break;
+                    case "Receiver_Name":
+                        vm.Receiver = i.Value;
                         break;
                 }
             }
@@ -504,7 +505,6 @@ namespace CharityMS.Controllers
             var DynamoDbclientobject = new AmazonDynamoDBClient(KeyList[0], KeyList[1], KeyList[2], RegionEndpoint.USEast1);
             
             List<KeyValuePair<string, AttributeValue>> updateListItem = new List<KeyValuePair<string, AttributeValue>>();
-            updateListItem.Add(new KeyValuePair<string, AttributeValue>("Quantity", new AttributeValue { N = vm.Quantity }));
             updateListItem.Add(new KeyValuePair<string, AttributeValue>("Inventory_Status", new AttributeValue { S = vm.Status }));
             updateListItem.Add(new KeyValuePair<string, AttributeValue>("Product_Name", new AttributeValue { S = vm.Name }));
             if (vm.ExpiredDate!=null)
@@ -544,6 +544,40 @@ namespace CharityMS.Controllers
         }
 
         
+        public async Task<IActionResult> Donate(string donorId, string inventoryId, string receiverName)
+        {
+            List<string> KeyList = getCredentialInfo();
+
+            var DynamoDbclientobject = new AmazonDynamoDBClient(KeyList[0], KeyList[1], KeyList[2], RegionEndpoint.USEast1);
+
+            List<KeyValuePair<string, AttributeValue>> updateListItem = new List<KeyValuePair<string, AttributeValue>>();
+            updateListItem.Add(new KeyValuePair<string, AttributeValue>("Inventory_Status", new AttributeValue { S = "Donated" }));
+            updateListItem.Add(new KeyValuePair<string, AttributeValue>("Receiver_Name", new AttributeValue { S = receiverName }));
+
+            foreach (var singleAttribute in updateListItem)
+            {
+                var value = new Dictionary<string, AttributeValue>();
+                value.Add(":value", singleAttribute.Value);
+                var request = new UpdateItemRequest
+                {
+                    TableName = tableName,
+                    Key = new Dictionary<string, AttributeValue>()
+                    {
+                        {"DonorID", new AttributeValue{S=donorId} },
+                        {"InventoryID", new AttributeValue{S=inventoryId} }
+                    },
+                    ExpressionAttributeValues = value,
+                    UpdateExpression = "SET " + singleAttribute.Key + " = :value"
+                };
+                await DynamoDbclientobject.UpdateItemAsync(request);
+            }
+            return RedirectToAction("InventoryList", "Inventory", new
+            {
+                msg = "Record of customer " + donorId + " is updated now!"
+            });
+        }
+
+
         public async Task<IActionResult> deleteInventory(string donorId, string inventoryId)
         {
             List<string> KeyList = getCredentialInfo();

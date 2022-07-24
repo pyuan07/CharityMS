@@ -5,6 +5,17 @@
 
 <h1>Index</h1>
 
+<form asp-action="Index">
+    <div class="input-group mb-3">
+        <select class="form-select form-control" id="filter-status">
+            <option selected value="">Please select a Status to Filter</option>
+            <option value="Registed">Registed</option>
+            <option value="Picked-Up">Picked-Up</option>
+        </select>
+        <button type="button" class="btn  btn-outline-secondary" onclick="onFilter()" style="width:150px">Filter</button>
+    </div>
+</form>
+
 <p>
     <a class="btn btn-primary" asp-action="Create">Create New</a>
 </p>
@@ -45,11 +56,13 @@
                 @Html.DisplayFor(modelItem => item.Status)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a>|
-                <a asp-action="UpdateStatusProve" asp-route-id="@item.Id">Pick Up</a>
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a>
                 @if (item.Status != "Picked-Up")
                 {
+                    <label>|</label>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                    <label>|</label>
+                    <a asp-action="UpdateStatusProve" asp-route-id="@item.Id">Pick Up</a>
                     <label>|</label>
                     <a asp-action="Delete" asp-controller="PickUp" asp-route-id="@item.Id">Delete</a>
                 }
@@ -59,3 +72,10 @@
         }
     </tbody>
 </table>
+
+<script>
+
+    function onFilter() {
+        location.href = '@Url.Action("Index","PickUp")'+'?status=' + $("#filter-status").val();
+    }
+</script>

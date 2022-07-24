@@ -12,48 +12,48 @@
                     <input type="hidden" asp-for="DonorID" value="@Model.DonorID" />
                     <input type="hidden" asp-for="InventoryID" value="@Model.InventoryID" />
                     <input type="hidden" asp-for="Category" value="@Model.Category" />
-                    <div class="row">
+                    <div class="row mb-3">
                         <div class="col-md-2">
                             <label>Donor Name:</label>
                         </div>
                         <div class="col-md-5">
-                            <input type="text" asp-for="DonorID" value="@Model.DonorID" disabled />
+                            <input type="text" asp-for="DonorID" value="@Model.DonorID" disabled class="form-control" />
                         </div>
                     </div>
 
-                    <div class="row">
+                    <div class="row mb-3">
                         <div class="col-md-2">
                             <label>Category:</label>
                         </div>
                         <div class="col-md-5">
-                            <select asp-for="Category" asp-items="@Model.Categories" class="form-control" disabled></select>
+                            <select asp-for="Category" asp-items="@Model.Categories" class="form-select" disabled></select>
                         </div>
                     </div>
-                    <div class="row">
+                    <div class="row mb-3">
                         <div class="col-md-2">
                             <label>Item Name:</label>
                         </div>
                         <div class="col-md-5">
-                            <input type="text" asp-for="Name" value="@Model.Name" />
+                            <input type="text" asp-for="Name" value="@Model.Name" class="form-control" />
                         </div>
                     </div>
 
 
                     @if (!String.IsNullOrEmpty(Model.ExpiredDate))
                     {
-                        <div class="row">
+                        <div class="row mb-3">
                             <div class="col-md-2">
                                 <label>ExpiredDate:</label>
                             </div>
                             <div class="col-md-5">
-                                <input type="date" asp-for="@Model.ExpiredDate" />
+                                <input type="date" asp-for="@Model.ExpiredDate" class="form-control"/>
                             </div>
                         </div>
                     }
 
                     @if (Model.ProductCondition != null)
                     {
-                        <div class="row">
+                        <div class="row mb-3">
                             <div class="col-md-2">
                                 <label>Condition:</label>
                             </div>
@@ -65,7 +65,7 @@
 
                     @if (Model.cloteSize != null)
                     {
-                        <div class="row">
+                        <div class="row mb-3">
                             <div class="col-md-2">
                                 <label>Clothe Size:</label>
                             </div>
@@ -77,18 +77,18 @@
 
                     @if (!String.IsNullOrEmpty(Model.Receiver))
                     {
-                        <div class="row">
+                        <div class="row mb-3">
                             <div class="col-md-2">
                                 <label>Receiver:</label>
                             </div>
                             <div class="col-md-5">
-                                <input type="text" asp-for="@Model.Receiver" disabled />
+                                <input type="text" asp-for="@Model.Receiver" disabled class="form-control" />
                             </div>
                         </div>
                     }
 
 
-                    <div class="row">
+                    <div class="row mb-3">
                         <div class="col-md-2">
                             <label>Status:</label>
                         </div>

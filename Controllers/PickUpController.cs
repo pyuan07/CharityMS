@@ -54,12 +54,17 @@ namespace CharityMS.Controllers
             return KeyList;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? status)
         {
             List<PickUpVM> vm = new List<PickUpVM>();
             var pu = _context.PickUp.ToList();
 
-            foreach(var i in pu)
+            if (User.IsInRole("User"))
+            {
+                pu = pu.Where(x => x.DonorId.Equals(Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)))).ToList();
+            }
+
+            foreach (var i in pu)
             {
                 User tempDonor = _indentityContext.Users.FirstOrDefault(m=>m.Id.Equals(i.DonorId.ToString()));
                 PickUpVM temp = new PickUpVM
@@ -74,7 +79,13 @@ namespace CharityMS.Controllers
                 temp.Donor = tempDonor;
                 vm.Add(temp);
             }
-                return View(vm);
+
+            if(status != null)
+            {
+                vm = vm.Where(x => x.Status.Equals(status)).ToList();
+            }
+            
+            return View(vm);
         }
 
         public async Task<IActionResult> Details(Guid? id)

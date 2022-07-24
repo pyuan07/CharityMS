@@ -11,10 +11,11 @@ namespace CharityMS.ViewModels
 {
     public class PickUpVM
     {
-        [Required]
+        
         [Display(Name = "Id")]
         public Guid Id { get; set; }
 
+        [Required]
         [Display(Name = "Address")]
         public string Location { get; set; }
 

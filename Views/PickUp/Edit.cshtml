@@ -1,0 +1,110 @@
+﻿@model CharityMS.ViewModels.PickUpDetailVM
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<div class="container">
+    <h1>Edit</h1>
+
+    <h1>@Model.Donor.FullName 's donation': </h1>
+    <br />
+    @if (Model.images != null)
+    {
+        <div class="card">
+            @{ int index = 0;}
+            @foreach (var image in Model.images)
+            {
+
+                string url = "https://" + image.BucketName + ".s3.amazonaws.com/" + image.Key;
+                <div class="card-body">
+                    <div>
+                        <img src="@url" width="400" height="300" />
+                    </div>
+                </div>
+                <input type="hidden" id="key1" value="@image.Key" />
+                <div class="card-footer">
+                    <button type="button" onClick="deleteImage()" class="btn btn-danger">Delete</button>
+                </div>
+                index++;
+            }
+        </div>
+    }
+<form id="updateForm" asp-action="Edit" method="post">
+    <input type="hidden" id="pid" value="@Model.Id" />
+    <input type="hidden" id="status" value="@Model.Id" />
+    <div class="form-group row mb-2">
+        <label asp-for="Location" class="col-form-label col-lg-3 col-sm-12">
+            Loaction<span class="text-danger">*</span> :
+        </label>
+        <div class="col-lg-5 col-md-9 col-sm-12">
+            <input asp-for="Location" class="form-control">
+            <span asp-validation-for="Location" class="text-danger"></span>
+        </div>
+    </div>
+
+
+    <div class="form-group row mb-2">
+        <label asp-for="EstimatiedPickUpDate" class="col-form-label col-lg-3 col-sm-12">
+            EstimatiedPickUpDate<span class="text-danger">*</span> :
+        </label>
+        <div class="col-lg-5 col-md-9 col-sm-12">
+            <input asp-for="EstimatiedPickUpDate" class="form-control" type="date">
+            <span asp-validation-for="EstimatiedPickUpDate" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="form-group row mb-2">
+        <label asp-for="PickUpDate" class="col-form-label col-lg-3 col-sm-12">
+            PickUpDate<span class="text-danger">*</span> :
+        </label>
+        <div class="col-lg-5 col-md-9 col-sm-12">
+            <input asp-for="PickUpDate" class="form-control" type="date">
+            <span asp-validation-for="PickUpDate" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div id="editorRows">
+        <h5>Donate Item:</h5>
+        @foreach (var item in Model.Donations)
+        {
+            <div class="row">
+                <div class="col-md-3">
+                    <span>Item Name: </span> <input asp-for="@item.ItemName" class="form-control" type="text">
+                </div>
+                <div class="col-md-3">
+                    <span>Quantity: </span> <input asp-for="@item.Quantity" class="form-control" type="number">
+                </div>
+            </div>
+        }
+
+    </div>
+
+    <div class="form-group">
+        <input id="submit" type="submit" value="Update" class="btn btn-primary" />
+    </div>
+</form>
+</div>
+
+@section scripts
+    {
+    <script>
+
+        function deleteImage() {
+            var fn = document.getElementById("key1").value;
+            var pid = document.getElementById("pid").value;
+            $.ajax({
+                url: "/PickUp/deleteImage",
+                data: { filename: fn, pid: pid },
+                success: function () {
+                    
+                }
+            });
+        }
+
+        function testing(arg) {
+            console.log("hello")
+        }
+
+    </script>
+}
+

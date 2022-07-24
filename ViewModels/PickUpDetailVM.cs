@@ -31,7 +31,7 @@ namespace CharityMS.ViewModels
         public DateTime PickUpDate { get; set; }
 
         [Display(Name = "Donations")]
-        public List<Item> Donations { get; set; }
+        public IEnumerable<Item> Donations { get; set; }
 
         public List<S3Object> images { get; set; }
     }

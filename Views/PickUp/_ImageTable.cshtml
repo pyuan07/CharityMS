@@ -1,0 +1,21 @@
+﻿<div>
+    <table border="1">
+        <tr>
+            <th>Image</th>
+            <th>Action</th>
+        </tr>
+        @{ int index = 0;}
+        <tr>
+            @foreach (var image in Model.images)
+            {
+                string url = "https://" + image.BucketName + ".s3.amazonaws.com/" + image.Key;
+                <div>
+                    <img src="@url" width="400" height="300" />
+                </div>
+                index++;
+            }
+        </tr>
+        }
+    </table>
+
+</div>

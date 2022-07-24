@@ -15,9 +15,6 @@ using Amazon.S3; //s3 bucket
 using System.IO; //file reading
 using Amazon; //S3 account location
 using Microsoft.Extensions.Configuration; //link to the appsettings.json - get info key
-using Microsoft.AspNetCore.Http; //upload file from user pc to the network
-using Amazon.S3.Transfer;
-using System.Net.Mime;
 
 namespace CharityMS.Controllers
 {
@@ -93,6 +90,7 @@ namespace CharityMS.Controllers
             }
 
             var pu =  await _context.PickUp.Include(i=>i.Donations).FirstOrDefaultAsync(i=>i.Id.Equals(id));
+            var donor = await _indentityContext.Users.FirstOrDefaultAsync(m => m.Id.Equals(pu.DonorId.ToString()));
             if (pu == null)
             {
                 return NotFound();
@@ -100,6 +98,7 @@ namespace CharityMS.Controllers
 
             PickUpDetailVM vm = new PickUpDetailVM
             {
+                Donor = donor,
                 Id = pu.Id,
                 Location = pu.Location,
                 Status = pu.Status,
@@ -107,6 +106,7 @@ namespace CharityMS.Controllers
                 Donations=pu.Donations
             };
 
+            ViewBag.items = pu.Donations;
             if (pu.Status.Equals("Picked-Up"))
             {
                 vm.PickUpDate = pu.PickUpDate;
@@ -186,10 +186,10 @@ namespace CharityMS.Controllers
                 _context.SaveChanges();
             }catch(Exception ex)
             {
-                Console.WriteLine(ex);
+                ex.StackTrace.ToString();
             }
 
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Index", "PickUp");
         }
 
         //GET: UserController/Edit/5
@@ -200,16 +200,60 @@ namespace CharityMS.Controllers
                 return NotFound();
             }
 
-            var pu = await _context.PickUp.FindAsync(id);
-            PickUpVM vm = new PickUpVM
-            {
-                Donor = _indentityContext.Users.FirstOrDefault(m=>m.Id==pu.DonorId.ToString()),
-
-            };
-            if (vm == null)
+            var pu = await _context.PickUp.Include(i => i.Donations).FirstOrDefaultAsync(i => i.Id.Equals(id));
+            var donor = await _indentityContext.Users.FirstOrDefaultAsync(m => m.Id.Equals(pu.DonorId.ToString()));
+            if (pu == null)
             {
                 return NotFound();
             }
+
+            PickUpDetailVM vm = new PickUpDetailVM
+            {
+                Donor = donor,
+                Id = pu.Id,
+                Location = pu.Location,
+                Status = pu.Status,
+                EstimatiedPickUpDate = pu.EstimatedPickUpDate,
+                Donations = pu.Donations
+            };
+
+            ViewBag.items = pu.Donations;
+            if (pu.Status.Equals("Picked-Up"))
+            {
+                vm.PickUpDate = pu.PickUpDate;
+                List<string> KeyList = getCredentialInfo();
+                var s3clientobject = new AmazonS3Client(KeyList[0], KeyList[1], KeyList[2], RegionEndpoint.USEast1);
+
+                List<S3Object> s3imageList = new List<S3Object>(); //use for storing the images objects to the frontend
+
+                //2. start to collect the images 1 by 1 from the S3
+                try
+                {
+                    //create token - next marker info
+                    string token = null;
+                    do
+                    {
+                        ListObjectsRequest request = new ListObjectsRequest() //read the items form the bucket now
+                        {
+                            BucketName = bucketname,
+                            Prefix = "prove/" + id.ToString() + "/",
+                            Delimiter = "/"
+                        };
+                        ListObjectsResponse response = await s3clientobject.ListObjectsAsync(request).ConfigureAwait(false); //return response from s3
+                        s3imageList.AddRange(response.S3Objects);
+                        token = response.NextMarker; // to determine whether still have next item in s3 or not
+                    } while (token != null);
+
+                    ViewBag.PreSignedURLList = getPreSignedURL(s3imageList, s3clientobject);
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest("Unable to read the images from S3! Error as here: " + ex.Message);
+                }
+                vm.images = s3imageList;
+                return View(vm);
+            }
+
             return View(vm);
         }
 
@@ -234,7 +278,6 @@ namespace CharityMS.Controllers
 
                 pu.Location = vm.Location;
                 pu.EstimatedPickUpDate = vm.EstimatiedPickUpDate;
-                pu.Donations = vm.Donations;
                 pu.Status = vm.Status;
 
                 _context.PickUp.Update(pu);
@@ -247,26 +290,57 @@ namespace CharityMS.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: UserController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
         // POST: UserController/Delete/5
-        [HttpPost]
-        public ActionResult Delete(Guid id)
+        public async Task<IActionResult> Delete(Guid id)
         {
             try
             {
-                PickUp pu = _context.PickUp.Find(id);
+                var pu = await _context.PickUp.Include(i => i.Donations).FirstOrDefaultAsync(i => i.Id.Equals(id));
+
+                foreach(var i in pu.Donations)
+                {
+                    _context.Item.Remove(i);
+                }
+
                 _context.PickUp.Remove(pu);
                 _context.SaveChanges();
-                return RedirectToAction(nameof(Index));
+
+                List<string> KeyList = getCredentialInfo();
+                var s3clientobject = new AmazonS3Client(KeyList[0], KeyList[1], KeyList[2], RegionEndpoint.USEast1);
+
+                List<S3Object> s3imageList = new List<S3Object>(); //use for storing the images objects to the frontend
+
+                string token = null;
+                do
+                {
+                    ListObjectsRequest request = new ListObjectsRequest() //read the items form the bucket now
+                    {
+                        BucketName = bucketname,
+                        Prefix = "prove/" + id.ToString() + "/",
+                        Delimiter = "/"
+                    };
+                    ListObjectsResponse response = await s3clientobject.ListObjectsAsync(request).ConfigureAwait(false); //return response from s3
+                    s3imageList.AddRange(response.S3Objects);
+                    token = response.NextMarker; // to determine whether still have next item in s3 or not
+                } while (token != null);
+
+                foreach(var i in s3imageList)
+                {
+                    var deleteObjectRequest = new DeleteObjectRequest //setup the request details
+                    {
+                        BucketName = bucketname,
+                        Key = i.Key,
+                    };
+
+                    await s3clientobject.DeleteObjectAsync(deleteObjectRequest);
+                }
+
+                return RedirectToAction("Index");
             }
-            catch
+            catch(Exception ex)
             {
-                return View();
+                Console.Write(ex);
+                return RedirectToAction("Index");
             }
         }
 
@@ -351,6 +425,37 @@ namespace CharityMS.Controllers
                 PreSignedURLList.Add(s3clientobject.GetPreSignedURL(request));
             }
             return PreSignedURLList;
+        }
+
+        public async Task<IActionResult> deleteImage(string filename, string pid)
+        {
+            //1. make connection
+            List<string> KeyList = getCredentialInfo();
+            var s3clientobject = new AmazonS3Client(KeyList[0], KeyList[1], KeyList[2], RegionEndpoint.USEast1);
+
+            //2. start deleting the image
+            string message = "";
+
+            try // need to edit later for deleting action!
+            {
+                var deleteObjectRequest = new DeleteObjectRequest //setup the request details
+                {
+                    BucketName = bucketname,
+                    Key = filename,
+                };
+
+                await s3clientobject.DeleteObjectAsync(deleteObjectRequest); //execute the request in S3
+                message = filename + " is successfully deleted from the S3 Bucket!";
+            }
+            catch (AmazonS3Exception ex)
+            {
+                message = "Error in deleting the " + filename + " : " + ex.Message;
+            }
+            catch (Exception ex)
+            {
+                message = "Error in deleting the " + filename + " : " + ex.Message;
+            }
+            return RedirectToAction("Edit", "PickUp", new { id = Guid.Parse(pid) });
         }
     }
 }

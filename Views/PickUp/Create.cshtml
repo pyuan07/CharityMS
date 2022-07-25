@@ -16,17 +16,17 @@
             </label>
             <div class="col-lg-5 col-md-9 col-sm-12">
                 <input asp-for="Location" class="form-control">
-                <span asp-validation-for="Location" class="text-danger"></span>
+                <span id="invalid-location" class="text-danger" style="display:none">The Location is Required.</span>
             </div>
         </div>
 
         <div class="form-group row mb-2">
             <label asp-for="EstimatiedPickUpDate" class="col-form-label col-lg-3 col-sm-12">
-                EstimatiedPickUpDate<span class="text-danger">*</span> :
+                Estimatied PickUp Date<span class="text-danger">*</span> :
             </label>
             <div class="col-lg-5 col-md-9 col-sm-12">
                 <input asp-for="EstimatiedPickUpDate" class="form-control" type="date" min="@DateTime.Now">
-                <span asp-validation-for="EstimatiedPickUpDate" class="text-danger"></span>
+                <span id="invalid-date" class="text-danger" style="display:none">The EstimatiedPickUpDate is Required.</span>
             </div>
         </div>
 
@@ -62,9 +62,17 @@
 
             $("input[name='Location']").each(function (i) {
                 var Location = $(this).val();
-                formData.append("vm.Location", Location);
+                if (Location == "") {
+                    $("#invalid-location").show();
+                }
+                else {
+                    $("#invalid-location").hide();
 
+                }
+                formData.append("vm.Location", Location);
             });
+
+
             $("input[name='EstimatiedPickUpDate']").each(function (i) {
                 var EstimatiedPickUpDate = $(this).val();
                 formData.append("vm.EstimatiedPickUpDate", EstimatiedPickUpDate);
@@ -88,7 +96,7 @@
                 processData: false,
                 contentType: false,
                  success: function (data) {
-                    if (data.Result == -1) {
+                    if (data.result == -1) {
                         Swal.fire({
                             icon: 'error',
                             title: 'Oops...',

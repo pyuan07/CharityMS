@@ -92,6 +92,21 @@
 
     <script type="text/javascript">
 
+        $(document).ready(function () {
+
+            var msg = "@ViewBag.msg";
+
+            if (msg)
+                Swal.fire({
+                    position: 'top-end',
+                    icon: 'info',
+                    text: msg,
+                    showConfirmButton: false,
+                    timer: 2500
+                })
+
+        })
+
         function categoryOnChange() {
             var cat = document.getElementById('catTxt').value
             console.log(cat)

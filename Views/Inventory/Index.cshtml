@@ -3,10 +3,6 @@
     ViewData["Title"] = "Index";
 }
 
-@if (ViewBag.msg != "")
-{
-    <script>alert("@ViewBag.msg");</script>
-}
 <center>
     <h1>Inventory Operations: </h1>
     <br />
@@ -20,3 +16,25 @@
     <a asp-action="InventoryList">Search a record from Inventory Table</a>
     &nbsp;&nbsp;&nbsp;
 </center>
+
+
+@section Scripts{
+    <script type="text/javascript">
+        //trigger when loaded
+        $(document).ready(function () {
+
+            var msg = "@ViewBag.msg";
+
+            if (msg)
+                Swal.fire({
+                    position: 'top-end',
+                    icon: 'info',
+                    text: msg,
+                    showConfirmButton: false,
+                    timer: 2500
+                })
+
+        })
+
+    </script>
+}

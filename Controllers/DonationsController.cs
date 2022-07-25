@@ -277,6 +277,7 @@ namespace CharityMS.Controllers
 
         public async Task<IActionResult> CreateRequest()
         {
+
             DonationRequest donation = new DonationRequest()
             {
                 Donations = new List<Item>()    
@@ -312,7 +313,15 @@ namespace CharityMS.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateRequest(DonationRequest donation)
         {
-            ResultMessageModel json = new ResultMessageModel();
+            ResultMessageModel resultMessageModel = new ResultMessageModel();
+
+
+            if (donation.Donations == null || donation.Donations.Where(x => x.ItemName != null && x.Quantity > 0).Count() < 1)
+            {
+                resultMessageModel.Result = -1;
+                resultMessageModel.Message = "At least one requested item is required!";
+                return Json(resultMessageModel);
+            }
 
             donation.Id = Guid.NewGuid();
             donation.ReceiverId = User.FindFirstValue(ClaimTypes.NameIdentifier) != null ? Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)) : Guid.Empty;
@@ -336,17 +345,17 @@ namespace CharityMS.Controllers
 
                 await sqsClient.SendMessageAsync(queueMessage);
 
-                json.Result = 0;
-                json.Message = "Your donations request already sent to the charity service!\n Your track number is: " + donation.Id;
+                resultMessageModel.Result = 0;
+                resultMessageModel.Message = "Your donations request already sent to the charity service!\n Your track number is: " + donation.Id;
             }
             catch (AmazonSQSException ex)
             {
-                json.Result = -1;
-                json.Message = "Unable to send your reservation order. Please try again!\n" + ex.Message;
+                resultMessageModel.Result = -1;
+                resultMessageModel.Message = "Unable to send your reservation order. Please try again!\n" + ex.Message;
             }
             #endregion
 
-            return Json(json);
+            return Json(resultMessageModel);
         }
 
         public IActionResult Create()

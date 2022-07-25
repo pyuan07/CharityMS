@@ -10,6 +10,7 @@ using Amazon.DynamoDBv2.Model;
 using Microsoft.Extensions.Configuration;
 using System.IO;
 using CharityMS.ViewModels;
+using CharityMS.Areas.Identity.Data;
 
 namespace CharityMS.Controllers
 {
@@ -111,7 +112,13 @@ namespace CharityMS.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> InsertInventory(InventoryVM vm)
         {
-            
+
+            if (!ModelState.IsValid)
+            {
+                ModelState.AddModelError(string.Empty, "Invalid Data");
+                return View(vm);
+            }
+
             List<string> KeyList = getCredentialInfo();
             var DynamoDbclientobject = new AmazonDynamoDBClient(KeyList[0], KeyList[1], KeyList[2], RegionEndpoint.USEast1);
 
@@ -411,6 +418,7 @@ namespace CharityMS.Controllers
         [HttpGet]
         public async Task<IActionResult> updateInventory(string donorId, string inventoryId)
         {
+
             List<string> keyLists = getCredentialInfo();
 
             var dynamoDBClientObject = new AmazonDynamoDBClient(keyLists[0], keyLists[1], keyLists[2], RegionEndpoint.USEast1);
@@ -500,6 +508,13 @@ namespace CharityMS.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> updateData(InventoryVM vm)
         {
+
+            if (!ModelState.IsValid)
+            {
+                ModelState.AddModelError(string.Empty, "Invalid Data");
+                return View(vm);
+            }
+
             List<string> KeyList = getCredentialInfo();
             
             var DynamoDbclientobject = new AmazonDynamoDBClient(KeyList[0], KeyList[1], KeyList[2], RegionEndpoint.USEast1);

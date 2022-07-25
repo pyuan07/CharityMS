@@ -182,11 +182,11 @@
                 processData: false,
                 contentType: false,
                 success: function (data) {
-                    if (data.Result == -1) {
+                    if (data.result == -1) {
                         Swal.fire({
                             icon: 'error',
                             title: 'Oops...',
-                            text: data.message
+                            text: data.essage
                         })
                     }
                     else {

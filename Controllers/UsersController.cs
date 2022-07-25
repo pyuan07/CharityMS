@@ -102,48 +102,49 @@ namespace CharityMS.Controllers
         }
 
         //GET: UserController/Edit/5
-        public async Task<IActionResult> Edit(Guid? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
+        //public async Task<IActionResult> Edit(Guid? id)
+        //{
+        //    if (id == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            var user = await _indentityContext.Users.FindAsync(id.ToString());
-            if (user == null)
-            {
-                return NotFound();
-            }
-            return View(user);
-        }
+        //    var user = await _indentityContext.Users.FindAsync(id.ToString());
+            
+        //    if (user == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    return View(user);
+        //}
 
-        // POST: UserController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult Edit(Guid id, User user)
-        {
-            if (id.ToString() != user.Id)
-            {
-                return NotFound();
-            }
+        //// POST: UserController/Edit/5
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public IActionResult Edit(Guid id, User user)
+        //{
+        //    if (id.ToString() != user.Id)
+        //    {
+        //        return NotFound();
+        //    }
 
-            if (!ModelState.IsValid)
-            {
-                ModelState.AddModelError(string.Empty, "Invalid Data");
-                return View(user);
-            }
+        //    if (!ModelState.IsValid)
+        //    {
+        //        ModelState.AddModelError(string.Empty, "Invalid Data");
+        //        return View(user);
+        //    }
 
-            try
-            {
-                _indentityContext.Update(user);
-                _indentityContext.SaveChanges();
-            }
-            catch (DbUpdateConcurrencyException ex)
-            {
-                Console.WriteLine(ex);
-            }
-            return RedirectToAction(nameof(Index));
-        }
+        //    try
+        //    {
+        //        //_indentityContext.Update(user);
+        //        //_indentityContext.SaveChanges();
+        //    }
+        //    catch (DbUpdateConcurrencyException ex)
+        //    {
+        //        Console.WriteLine(ex);
+        //    }
+        //    return RedirectToAction(nameof(Index));
+        //}
 
         // GET: UserController/Delete/5
         public ActionResult Delete(int id)

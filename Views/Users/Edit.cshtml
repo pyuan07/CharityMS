@@ -1,62 +1,79 @@
 ﻿@model CharityMS.Areas.Identity.Data.User
-    @{
+
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<CharityMS.Areas.Identity.Data.User> UserManager
+
+@{
     ViewData["Title"] = "Edit";
     Layout = "~/Views/Shared/_Layout.cshtml";
-    }
+}
 
-    <h1>Edit</h1>
+<h1>Edit</h1>
 
-    <h4>User</h4>
-    <hr />
-    <div>
-        <form id="createForm" asp-action="Edit">
+<h4>User</h4>
+<hr />
+<div>
+    <form id="createForm" asp-action="Edit">
 
-            <div class="form-group row mb-2">
-                <label asp-for="Email" class="col-form-label col-lg-3 col-sm-12">
-                    Email<span class="text-danger">*</span> :
+        <div class="form-group row mb-2">
+            <label asp-for="Email" class="col-form-label col-lg-3 col-sm-12">
+                Email<span class="text-danger">*</span> :
+            </label>
+            <div class="col-lg-5 col-md-9 col-sm-12">
+                <input asp-for="Email" readonly class="form-control">
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="form-group row mb-2">
+            <label asp-for="FullName" class="col-form-label col-lg-3 col-sm-12">
+                FullName<span class="text-danger">*</span> :
+            </label>
+            <div class="col-lg-5 col-md-9 col-sm-12">
+                <input asp-for="FullName" class="form-control">
+                <span asp-validation-for="FullName" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="form-group row mb-2">
+            <label asp-for="PhoneNumber" class="col-form-label col-lg-3 col-sm-12">
+                Phone Number<span class="text-danger">*</span> :
+            </label>
+            <div class="col-lg-5 col-md-9 col-sm-12">
+                <input asp-for="PhoneNumber" class="form-control">
+                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+            </div>
+        </div>
+
+        @if (UserManager.GetRolesAsync(Model).Result.Contains("User"))
+        {
+            <div class="form-group row mb-2" id="address-div">
+                <label asp-for="Address" class="col-form-label col-lg-3 col-sm-12">
+                    Address<span class="text-danger">*</span> :
                 </label>
                 <div class="col-lg-5 col-md-9 col-sm-12">
-                    <input asp-for="Email" readonly class="form-control">
-                    <span asp-validation-for="Email" class="text-danger"></span>
+                    <input asp-for="Address" class="form-control">
+                    <span asp-validation-for="Address" class="text-danger"></span>
                 </div>
             </div>
+        }
 
-            <div class="form-group row mb-2">
-                <label asp-for="FullName" class="col-form-label col-lg-3 col-sm-12">
-                    FullName<span class="text-danger">*</span> :
-                </label>
-                <div class="col-lg-5 col-md-9 col-sm-12">
-                    <input asp-for="FullName" class="form-control">
-                    <span asp-validation-for="FullName" class="text-danger"></span>
-                </div>
-            </div>
-
-            <div class="form-group row mb-2">
-                <label asp-for="PhoneNumber" class="col-form-label col-lg-3 col-sm-12">
-                    Phone Number<span class="text-danger">*</span> :
-                </label>
-                <div class="col-lg-5 col-md-9 col-sm-12">
-                    <input asp-for="PhoneNumber" class="form-control">
-                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
-                </div>
-            </div>
+        <div class="form-group">
+            <input type="submit" value="Save" class="btn btn-primary" />
+        </div>
+    </form>
+</div>
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
 
 
-            @*<div class="form-group row mb-2">
-                    <label asp-for="Address" class="col-form-label col-lg-3 col-sm-12">
-                        Address<span class="text-danger">*</span> :
-                    </label>
-                    <div class="col-lg-5 col-md-9 col-sm-12">
-                        <input asp-for="Address" class="form-control">
-                        <span asp-validation-for="Address" class="text-danger"></span>
-                    </div>
-                </div>*@
+@section Scripts{
+    <script type="text/javascript">
+        //trigger when loaded
+        $(document).ready(function () {
 
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
-    <div>
-        <a asp-action="Index">Back to List</a>
-    </div>
+        })
+
+    </script>
+}

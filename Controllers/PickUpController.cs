@@ -176,6 +176,13 @@ namespace CharityMS.Controllers
                 return Json(resultMessageModel);
             }
 
+            if(vm.Donations == null || vm.Donations.Where(x=>x.ItemName != null && x.Quantity > 0).Count() < 1)
+            {
+                resultMessageModel.Result = -1;
+                resultMessageModel.Message = "At least one donation item is required!";
+                return Json(resultMessageModel);
+            }
+
             try
             {
                 var pickUp = new PickUp

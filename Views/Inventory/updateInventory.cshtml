@@ -34,7 +34,8 @@
                             <label>Item Name:</label>
                         </div>
                         <div class="col-md-5">
-                            <input type="text" asp-for="Name" value="@Model.Name" class="form-control" />
+                            <input type="text" asp-for="Name" value="@Model.Name" class="form-control" required/>
+                            <span asp-validation-for="Name" class="text-danger"></span>
                         </div>
                     </div>
 
@@ -46,7 +47,9 @@
                                 <label>ExpiredDate:</label>
                             </div>
                             <div class="col-md-5">
-                                <input type="date" asp-for="@Model.ExpiredDate" class="form-control"/>
+                                <input type="date" asp-for="@Model.ExpiredDate" class="form-control" required />
+                                <span asp-validation-for="ExpiredDate" class="text-danger"></span>
+
                             </div>
                         </div>
                     }
@@ -58,7 +61,9 @@
                                 <label>Condition:</label>
                             </div>
                             <div class="col-md-5">
-                                <select asp-for="ProductCondition" asp-items="@Model.Conditions" class="form-control"></select>
+                                <select asp-for="ProductCondition" asp-items="@Model.Conditions" class="form-control" required></select>
+                                <span asp-validation-for="ProductCondition" class="text-danger"></span>
+
                             </div>
                         </div>
                     }
@@ -70,7 +75,8 @@
                                 <label>Clothe Size:</label>
                             </div>
                             <div class="col-md-5">
-                                <select asp-for="cloteSize" asp-items="@Model.clothSizes" class="form-control"></select>
+                                <select asp-for="cloteSize" asp-items="@Model.clothSizes" class="form-control" required></select>
+                                <span asp-validation-for="cloteSize" class="text-danger"></span>
                             </div>
                         </div>
                     }
@@ -93,7 +99,9 @@
                             <label>Status:</label>
                         </div>
                         <div class="col-md-5">
-                            <select asp-for="Status" asp-items="@Model.Statusddl" class="form-control"></select>
+                            <select asp-for="Status" asp-items="@Model.Statusddl" class="form-control" required></select>
+                            <span asp-validation-for="Status" class="text-danger"></span>
+
                         </div>
                     </div>
 

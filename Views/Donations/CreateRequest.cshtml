@@ -117,7 +117,7 @@
             formData.append("donation.Reason", $("#reason-textfield").val());
             formData.append("donation.ApplicantName", $("#applicant-textfield").val());
 
-            let valid = false;
+            let valid = true;
 
             $("input[name='ItemName']").each(function (i) {
                 var ItemName = $(this).val();

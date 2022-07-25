@@ -121,12 +121,10 @@ namespace CharityMS.Controllers
 
             List<string> KeyList = getCredentialInfo();
             var DynamoDbclientobject = new AmazonDynamoDBClient(KeyList[0], KeyList[1], KeyList[2], RegionEndpoint.USEast1);
-
             
             Dictionary<string, AttributeValue> documentRecord = new Dictionary<string, AttributeValue>();
             string message = "";
 
-            
             try
             {
                 for (int i = 0; i < int.Parse(vm.Quantity); i++)
@@ -188,23 +186,18 @@ namespace CharityMS.Controllers
             
             List<string> KeyList = getCredentialInfo();
             var DynamoDbclientobject = new AmazonDynamoDBClient(KeyList[0], KeyList[1], KeyList[2], RegionEndpoint.USEast1);
-
             
             List<Document> returnRecords = new List<Document>(); 
             List<KeyValuePair<string, string>> singleConvertedRecord = new List<KeyValuePair<string, string>>(); 
             List<List<KeyValuePair<string, string>>> fullList = new List<List<KeyValuePair<string, string>>>();
             string message = "";
-
             
             try
             {
-                
                 ScanFilter scanprice = new ScanFilter();
-
                 
                 Table customerTransactions = Table.LoadTable(DynamoDbclientobject, tableName);
                 Search search = customerTransactions.Scan(scanprice); 
-
 
                 do
                 {
@@ -215,7 +208,6 @@ namespace CharityMS.Controllers
                         ViewBag.msg = "Record is not found! ";
                         return View(fullList);
                     }
-
                    
                     foreach (var singlerecord in returnRecords)
                     {
@@ -304,7 +296,6 @@ namespace CharityMS.Controllers
             
             List<string> KeyList = getCredentialInfo();
             var DynamoDbclientobject = new AmazonDynamoDBClient(KeyList[0], KeyList[1], KeyList[2], RegionEndpoint.USEast1);
-
             
             List<Document> returnRecords = new List<Document>(); 
             List<KeyValuePair<string, string>> singleConvertedRecord = new List<KeyValuePair<string, string>>(); 
@@ -313,17 +304,16 @@ namespace CharityMS.Controllers
 
             try
             {
-                ScanFilter scanprice = new ScanFilter();
+                ScanFilter scanStatement = new ScanFilter();
                 if (!String.IsNullOrEmpty(category))
-                    scanprice.AddCondition("Inventory_Category", ScanOperator.Contains, category);
+                    scanStatement.AddCondition("Inventory_Category", ScanOperator.Contains, category);
                 if (!String.IsNullOrEmpty(itemName))
-                    scanprice.AddCondition("Product_Name", ScanOperator.Contains, itemName);
+                    scanStatement.AddCondition("Product_Name", ScanOperator.Contains, itemName);
                 if (!String.IsNullOrEmpty(status))
-                    scanprice.AddCondition("Inventory_Status", ScanOperator.Contains, status);
+                    scanStatement.AddCondition("Inventory_Status", ScanOperator.Contains, status);
 
                 Table customerTransactions = Table.LoadTable(DynamoDbclientobject, tableName);
-                Search search = customerTransactions.Scan(scanprice);
-                    
+                Search search = customerTransactions.Scan(scanStatement);
 
                 do
                 {

@@ -372,7 +372,6 @@ namespace CharityMS.Controllers
             string filename = "";
             foreach (var image in images)
             {
-                //2.1 small input validation
                 if (image.Length <= 0)
                 {
                     return BadRequest(image.FileName + " is having empty content! So unable to upload to the S3");
@@ -397,7 +396,6 @@ namespace CharityMS.Controllers
                         CannedACL = S3CannedACL.PublicRead
                     };
 
-                    //b. execute your request command
                     await s3clientobject.PutObjectAsync(uploadRequest);
                     filename = filename + " " + image.FileName + ",";
 
@@ -449,7 +447,6 @@ namespace CharityMS.Controllers
             }
 
             return Json(resultMessageModel);
-            //return RedirectToAction("Edit", "PickUp", new { id = Guid.Parse(pid) });
         }
     }
 }

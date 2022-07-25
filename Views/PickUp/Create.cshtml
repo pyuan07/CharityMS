@@ -30,28 +30,30 @@
             </div>
         </div>
 
-        <div class="card mb-2">
-            <div class="card-header">
-                Donate Item <span class="text-danger">*</span> :
-            </div>
-            <div class="card-body">
-                <div id="editorRows">
-                    @foreach (var item in Model.Donations)
-                    {
-                        <partial name="_DonationItem" asp-for="item" />
-                    }
+        <div class=" mb-2">
+            <div class="card">
+                <div class="card-header">
+                    Donate Item <span class="text-danger">*</span> :
                 </div>
-                <a id="addItem" asp-controller="Donations" asp-action="BlankItem" class="btn btn-primary btn-sm">Add Item</a>
+                <div class="card-body">
+                    <div id="editorRows">
+                        @foreach (var item in Model.Donations)
+                        {
+                            <partial name="_DonationItem" asp-for="item" />
+                        }
+                    </div>
+                    <a id="addItem" asp-controller="Donations" asp-action="BlankItem" class="btn btn-primary btn-sm">Add Item</a>
+                </div>
             </div>
+            <span id="invalid-item" class="text-danger" style="display:none">The Item Name and Quantity are Required.</span>
+
         </div>
 
         <div class="form-group">
-            <input id="submit" type="submit" value="Create" class="btn btn-primary" />
+            <input id="submit" type="submit" value="Create" class="btn btn-primary" style="width:120px" />
+            <a asp-action="Index" class="btn btn-secondary" style="width:120px">Back</a>
         </div>
     </form>
-</div>
-<div>
-    <a asp-action="Index">Back to List</a>
 </div>
 
 @section scripts {
@@ -59,7 +61,7 @@
         $("#submit").click(function (e) {
             e.preventDefault();
             var formData = new FormData();
-
+            
             $("input[name='Location']").each(function (i) {
                 var Location = $(this).val();
                 if (Location == "") {
@@ -75,46 +77,67 @@
 
             $("input[name='EstimatiedPickUpDate']").each(function (i) {
                 var EstimatiedPickUpDate = $(this).val();
+                if (EstimatiedPickUpDate == "") {
+                    $("#invalid-date").show();
+                }
+                else {
+                    $("#invalid-date").hide();
+
+                }
                 formData.append("vm.EstimatiedPickUpDate", EstimatiedPickUpDate);
 
             });
+
+            let valid = true;
+
             $("input[name='ItemName']").each(function (i) {
                 var ItemName = $(this).val();
-                formData.append("vm.Donations[" + i + "].ItemName", ItemName);
+                if (ItemName == "") {
+                    valid = false;
+                }
 
+                formData.append("vm.Donations[" + i + "].ItemName", ItemName);
             });
+
             $("input[name='Quantity']").each(function (i) {
                 var Quantity = $(this).val();
-                formData.append("vm.Donations[" + i + "].Quantity", Quantity);
-
-            });
-
-            $.ajax({
-                method: 'post',
-                url: "/PickUp/Create",
-                data: formData,
-                processData: false,
-                contentType: false,
-                 success: function (data) {
-                    if (data.result == -1) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Oops...',
-                            text: data.message
-                        })
-                    }
-                    else {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Congratulations',
-                            text: data.message
-                        }).then(function () {
-                            location.href = '@Url.Action("Index", "PickUp")';
-                        });
-                    }
+                if (Quantity < 1) {
+                    valid = false;
                 }
+
+                formData.append("vm.Donations[" + i + "].Quantity", Quantity);
             });
 
+            if (valid) {
+                $("#invalid-item").hide();
+                $.ajax({
+                    method: 'post',
+                    url: "/PickUp/Create",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (data) {
+                        if (data.result == -1) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: data.message
+                            })
+                        }
+                        else {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Congratulations',
+                                text: data.message
+                            }).then(function () {
+                                location.href = '@Url.Action("Index", "PickUp")';
+                            });
+                        }
+                    }
+                });
+            } else {
+                $("#invalid-item").show();
+            }
         });
 
         $("#addItem").click(function () {

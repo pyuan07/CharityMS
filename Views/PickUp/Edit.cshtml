@@ -29,96 +29,96 @@
             }
         </div>
     }
-<form id="updateForm" asp-action="Edit" method="post">
-    <input type="hidden" asp-for="Id" id="pid" value="@Model.Id" />
-    <input type="hidden" asp-for="Status" id="status" value="@Model.Status" />
-    <div class="form-group row mb-2">
-        <label asp-for="Location" class="col-form-label col-lg-3 col-sm-12">
-            Loaction<span class="text-danger">*</span> :
-        </label>
-        <div class="col-lg-5 col-md-9 col-sm-12">
-            <input asp-for="Location" class="form-control">
-            <span asp-validation-for="Location" class="text-danger"></span>
+    <form id="updateForm" asp-action="Edit" method="post">
+        <input type="hidden" asp-for="Id" id="pid" value="@Model.Id" />
+        <input type="hidden" asp-for="Status" id="status" value="@Model.Status" />
+        <div class="form-group row mb-2">
+            <label asp-for="Location" class="col-form-label col-lg-3 col-sm-12">
+                Loaction<span class="text-danger">*</span> :
+            </label>
+            <div class="col-lg-5 col-md-9 col-sm-12">
+                <input asp-for="Location" class="form-control">
+                <span asp-validation-for="Location" class="text-danger"></span>
+            </div>
         </div>
-    </div>
 
 
-    <div class="form-group row mb-2">
-        <label asp-for="EstimatiedPickUpDate" class="col-form-label col-lg-3 col-sm-12">
-            EstimatiedPickUpDate<span class="text-danger">*</span> :
-        </label>
-        <div class="col-lg-5 col-md-9 col-sm-12">
-            <input asp-for="EstimatiedPickUpDate" class="form-control" type="date">
-            <span asp-validation-for="EstimatiedPickUpDate" class="text-danger"></span>
+        <div class="form-group row mb-2">
+            <label asp-for="EstimatiedPickUpDate" class="col-form-label col-lg-3 col-sm-12">
+                EstimatiedPickUpDate<span class="text-danger">*</span> :
+            </label>
+            <div class="col-lg-5 col-md-9 col-sm-12">
+                <input asp-for="EstimatiedPickUpDate" class="form-control" type="date">
+                <span asp-validation-for="EstimatiedPickUpDate" class="text-danger"></span>
+            </div>
         </div>
-    </div>
 
-    @*<div class="form-group row mb-2">
-        <label asp-for="PickUpDate" class="col-form-label col-lg-3 col-sm-12">
-            PickUpDate<span class="text-danger">*</span> :
-        </label>
-        <div class="col-lg-5 col-md-9 col-sm-12">
-            <input asp-for="PickUpDate" class="form-control" type="date">
-            <span asp-validation-for="PickUpDate" class="text-danger"></span>
-        </div>
-    </div>*@
-
-    @*<div id="editorRows">
-            <h5>Donate Item:</h5>
-            @foreach (var item in Model.Donations)
-            {
-                <div class="row">
-                    <div class="col-md-3">
-                        <span>Item Name: </span> <input asp-for="@item.ItemName" class="form-control" type="text">
-                    </div>
-                    <div class="col-md-3">
-                        <span>Quantity: </span> <input asp-for="@item.Quantity" class="form-control" type="number">
-                    </div>
+        @*<div class="form-group row mb-2">
+                <label asp-for="PickUpDate" class="col-form-label col-lg-3 col-sm-12">
+                    PickUpDate<span class="text-danger">*</span> :
+                </label>
+                <div class="col-lg-5 col-md-9 col-sm-12">
+                    <input asp-for="PickUpDate" class="form-control" type="date">
+                    <span asp-validation-for="PickUpDate" class="text-danger"></span>
                 </div>
-            }
-        </div>*@
+            </div>*@
 
-    <div class="row">
-        <div class="col-lg-3 col-sm-12">
-            Donation Items:
-        </div>
-        <div class="col-lg-5 col-md-9 col-sm-12">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>
-                            Item Name
-                        </th>
-                        <th>
-                            Item Quantity
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (Model.Donations != null)
-                    {
-                        @foreach (var item in Model.Donations)
+        @*<div id="editorRows">
+                <h5>Donate Item:</h5>
+                @foreach (var item in Model.Donations)
+                {
+                    <div class="row">
+                        <div class="col-md-3">
+                            <span>Item Name: </span> <input asp-for="@item.ItemName" class="form-control" type="text">
+                        </div>
+                        <div class="col-md-3">
+                            <span>Quantity: </span> <input asp-for="@item.Quantity" class="form-control" type="number">
+                        </div>
+                    </div>
+                }
+            </div>*@
+
+        <div class="row">
+            <div class="col-lg-3 col-sm-12">
+                Donation Items:
+            </div>
+            <div class="col-lg-5 col-md-9 col-sm-12">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>
+                                Item Name
+                            </th>
+                            <th>
+                                Item Quantity
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Donations != null)
                         {
-                            <tr>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.ItemName)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.Quantity)
-                                </td>
-                            </tr>
+                            @foreach (var item in Model.Donations)
+                            {
+                                <tr>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.ItemName)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Quantity)
+                                    </td>
+                                </tr>
+                            }
                         }
-                    }
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
 
-    <div class="form-group">
-        <input id="submit" type="submit" value="Update" class="btn btn-primary" />
-        <a asp-action="Index" class="btn btn-secondary">Back</a>
-    </div>
-</form>
+        <div class="form-group mt-3">
+            <input id="submit" type="submit" value="Update" class="btn btn-primary" style="width:120px" />
+            <a asp-action="Index" class="btn btn-secondary" style="width:120px">Back</a>
+        </div>
+    </form>
 </div>
 
 @section scripts

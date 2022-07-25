@@ -3,10 +3,6 @@
     ViewData["Title"] = "InsertInventory";
 }
 
-@if (ViewBag.msg != "")
-{
-    <script>alert("@ViewBag.msg");</script>
-}
 
 <h1>Insert Inventory Form:</h1>
 <br />
@@ -51,31 +47,38 @@
                     </div>
                 </div>
 
-                <div class="row mb-3" style="display:none" id="expiredDateDiv">
-                    <div class="col-md-2">
-                        <label>ExpiredDate:</label>
-                    </div>
-                    <div class="col-md-5">
-                        <input type="date" asp-for="@Model.ExpiredDate" class="form-control" />
-                        <span asp-validation-for="ExpiredDate" class="text-danger"></span>
-                    </div>
-                </div>
-                <div class="row mb-3" style="display:none" id="condition">
-                    <div class="col-md-2">
-                        <label>Condition:</label>
-                    </div>
-                    <div class="col-md-5">
-                        <select asp-for="ProductCondition" asp-items="@Model.Conditions" class="form-control"></select>
-                        <span asp-validation-for="ProductCondition" class="text-danger"></span>
+                <div style="display:none" id="expiredDateDiv">
+                    <div class="row mb-3">
+                        <div class="col-md-2">
+                            <label>ExpiredDate:</label>
+                        </div>
+                        <div class="col-md-5">
+                            <input type="date" asp-for="@Model.ExpiredDate" class="form-control" />
+                            <span asp-validation-for="ExpiredDate" class="text-danger"></span>
+                        </div>
                     </div>
                 </div>
-                <div class="row mb-3" style="display:none" id="size">
-                    <div class="col-md-2">
-                        <label>Clothe Size:</label>
+
+                <div style="display:none" id="condition">
+                    <div class="row mb-3">
+                        <div class="col-md-2">
+                            <label>Condition:</label>
+                        </div>
+                        <div class="col-md-5">
+                            <select asp-for="ProductCondition" asp-items="@Model.Conditions" class="form-select"></select>
+                            <span asp-validation-for="ProductCondition" class="text-danger"></span>
+                        </div>
                     </div>
-                    <div class="col-md-5">
-                        <select asp-for="cloteSize" asp-items="@Model.clothSizes" class="form-control"></select>
-                        <span asp-validation-for="cloteSize" class="text-danger"></span>
+                </div>
+                <div style="display:none" id="size">
+                    <div class="row mb-3">
+                        <div class="col-md-2">
+                            <label>Clothe Size:</label>
+                        </div>
+                        <div class="col-md-5">
+                            <select asp-for="cloteSize" asp-items="@Model.clothSizes" class="form-select"></select>
+                            <span asp-validation-for="cloteSize" class="text-danger"></span>
+                        </div>
                     </div>
                 </div>
 
@@ -105,6 +108,7 @@
                     timer: 2500
                 })
 
+            categoryOnChange();
         })
 
         function categoryOnChange() {

@@ -211,18 +211,14 @@ namespace CharityMS.Controllers
             return Json(resultMessageModel);
         }
 
-        public async Task<IActionResult> Edit(Guid? id)
+        private async Task<PickUpDetailVM> getPickUpDetailsAsync(Guid? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
 
             var pu = await _context.PickUp.Include(i => i.Donations).FirstOrDefaultAsync(i => i.Id.Equals(id));
             var donor = await _indentityContext.Users.FirstOrDefaultAsync(m => m.Id.Equals(pu.DonorId.ToString()));
             if (pu == null)
             {
-                return NotFound();
+                return new PickUpDetailVM();
             }
 
             PickUpDetailVM vm = new PickUpDetailVM
@@ -235,7 +231,6 @@ namespace CharityMS.Controllers
                 Donations = pu.Donations
             };
 
-            ViewBag.items = pu.Donations;
             if (pu.Status.Equals("Picked-Up"))
             {
                 vm.PickUpDate = pu.PickUpDate;
@@ -255,19 +250,30 @@ namespace CharityMS.Controllers
                             Prefix = "prove/" + id.ToString() + "/",
                             Delimiter = "/"
                         };
-                        ListObjectsResponse response = await s3clientobject.ListObjectsAsync(request).ConfigureAwait(false); 
-                        s3imageList.AddRange(response.S3Objects);
+                        ListObjectsResponse response = await s3clientobject.ListObjectsAsync(request).ConfigureAwait(false);
+                        s3imageList.AddRange(response.S3Objects);   
                         token = response.NextMarker;
                     } while (token != null);
-
+                        
                 }
                 catch (Exception ex)
                 {
-                    return BadRequest("Unable to read the images from S3! Error as here: " + ex.Message);
+                    Console.WriteLine("Unable to read the images from S3! Error as here: " + ex.Message);
                 }
                 vm.images = s3imageList;
-                return View(vm);
             }
+
+            return vm;
+        }
+
+        public async Task<IActionResult> Edit(Guid? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            PickUpDetailVM vm = await getPickUpDetailsAsync(id);
 
             return View(vm);
         }
@@ -283,7 +289,13 @@ namespace CharityMS.Controllers
             if (!ModelState.IsValid)
             {
                 ModelState.AddModelError(string.Empty, "Invalid Data");
-                return View(vm);
+                PickUpDetailVM vmDetail = await getPickUpDetailsAsync(id);
+
+                vmDetail.Location = vm.Location;
+                vmDetail.EstimatiedPickUpDate = vm.EstimatiedPickUpDate;
+                vmDetail.Status = vm.Status;
+
+                return View(vmDetail);
             }
 
             try

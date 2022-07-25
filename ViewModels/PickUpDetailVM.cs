@@ -20,6 +20,7 @@ namespace CharityMS.ViewModels
         public User Donor { get; set; }
 
         [Required]
+        [DisplayFormat(DataFormatString = "{0:MM/dd/yyyy}", ApplyFormatInEditMode = true)]
         [Display(Name = "Estimated Pick Up Date")]
         public DateTime EstimatiedPickUpDate { get; set; }
 

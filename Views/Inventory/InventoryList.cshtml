@@ -255,7 +255,16 @@
         })
 
         function onDonate(donor, inv) {
-            location.href = '@Url.Action("Donate", "Inventory")' + '?donorId=' + donor + '&inventoryId=' + inv + '&receiverName=' + $('#receiver-txt_' + inv).val();
+            var rec = $('#receiver-txt_' + inv).val();
+            if (rec == "" || rec==null) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Opps...',
+                    text: "Please enter a receiver name"
+                })
+                return;
+            }
+            location.href = '@Url.Action("Donate", "Inventory")' + '?donorId=' + donor + '&inventoryId=' + inv + '&receiverName=' + rec;
         }
     </script>
 }

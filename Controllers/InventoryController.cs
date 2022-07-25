@@ -168,7 +168,7 @@ namespace CharityMS.Controllers
 
                     await DynamoDbclientobject.PutItemAsync(request);
                 }
-                message = "Donation from of user - " + vm.DonorID + " is added to the Inventory table now! ";
+                message = "Donation from user - " + vm.DonorID + " is added to the Inventory table now! ";
             }
             catch (AmazonDynamoDBException ex)
             {
@@ -299,7 +299,7 @@ namespace CharityMS.Controllers
         
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> InventoryList(string category, string status, string pruductName)
+        public async Task<IActionResult> InventoryList(string category, string status, string itemName)
         {
             
             List<string> KeyList = getCredentialInfo();
@@ -316,8 +316,8 @@ namespace CharityMS.Controllers
                 ScanFilter scanprice = new ScanFilter();
                 if (!String.IsNullOrEmpty(category))
                     scanprice.AddCondition("Inventory_Category", ScanOperator.Contains, category);
-                if (!String.IsNullOrEmpty(pruductName))
-                    scanprice.AddCondition("Product_Name", ScanOperator.Contains, pruductName);
+                if (!String.IsNullOrEmpty(itemName))
+                    scanprice.AddCondition("Product_Name", ScanOperator.Contains, itemName);
                 if (!String.IsNullOrEmpty(status))
                     scanprice.AddCondition("Inventory_Status", ScanOperator.Contains, status);
 
@@ -508,12 +508,6 @@ namespace CharityMS.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> updateData(InventoryVM vm)
         {
-
-            if (!ModelState.IsValid)
-            {
-                ModelState.AddModelError(string.Empty, "Invalid Data");
-                return View(vm);
-            }
 
             List<string> KeyList = getCredentialInfo();
             

@@ -6,7 +6,7 @@
 <h1>Update Inventory</h1>
 <div class="container">
         <br /><hr /><br />
-        <form method="post" asp-action="updateData">
+        <form method="post" asp-action="updateData" asp-controller="Inventory">
             <div class="card" style="background-color:lightblue; padding:12px;">
                 <div class="form-field">
                     <input type="hidden" asp-for="DonorID" value="@Model.DonorID" />

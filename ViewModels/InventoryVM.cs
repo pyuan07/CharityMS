@@ -9,6 +9,7 @@ namespace CharityMS.ViewModels
 {
     public class InventoryVM
     {
+        [Required]
         public string DonorID { get; set; }
 
         public string InventoryID { get; set; }
@@ -19,7 +20,6 @@ namespace CharityMS.ViewModels
         [Required]
         public string Quantity { get; set; }
 
-        [Required]
         public DateTime DonationDate { get; set; }
 
         public string ExpiredDate { get; set; }
@@ -33,7 +33,6 @@ namespace CharityMS.ViewModels
 
         public string Receiver { get; set; }
 
-        [Required]
         public string Status { get; set; }
 
         public List<SelectListItem> Categories { get; } = new List<SelectListItem>

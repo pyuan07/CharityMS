@@ -149,6 +149,7 @@ namespace CharityMS.Controllers
         public async Task<IActionResult> CheckRequest()
         {
 
+            #region Get Queue
             //connection
             List<string> keys = getCredentialInfo();
             var sqsClient = new AmazonSQSClient(keys[0], keys[1], keys[2], RegionEndpoint.USEast1);
@@ -156,11 +157,10 @@ namespace CharityMS.Controllers
             //get the queue URL 
             var response = await sqsClient.GetQueueUrlAsync(new GetQueueUrlRequest { QueueName = queueName });
 
-            #region Get Queue
-
             DonationRequest donation = new DonationRequest();
             try
             {
+                //Define the details in ReceiveMessageRequest
                 ReceiveMessageRequest receivedRequest = new ReceiveMessageRequest
                 {
                     QueueUrl = response.QueueUrl,
@@ -169,6 +169,7 @@ namespace CharityMS.Controllers
                     VisibilityTimeout = 20 //decide how much time the item not viewable by other people while still reading 
                 };
 
+                //Send the Request and return the Response from AWS
                 ReceiveMessageResponse returnResponse = await sqsClient.ReceiveMessageAsync(receivedRequest);
 
 
@@ -179,12 +180,10 @@ namespace CharityMS.Controllers
                     return View();
                 }
 
-                for (int i = 0; i < returnResponse.Messages.Count; i++)
-                {
-                    donation = JsonConvert.DeserializeObject<DonationRequest>(returnResponse.Messages[i].Body); //json back to object style
-                    ViewBag.DeleteToken = returnResponse.Messages[i].ReceiptHandle;
-                    ViewBag.Data = returnResponse.Messages[i].Body;
-                }
+                //DeserializeObject the message from Json to Object,DonationRequest
+                donation = JsonConvert.DeserializeObject<DonationRequest>(returnResponse.Messages[0].Body);
+                ViewBag.DeleteToken = returnResponse.Messages[0].ReceiptHandle; // ReceiptHandle will be used when 
+                ViewBag.Data = returnResponse.Messages[0].Body;
             }
             catch (AmazonSQSException ex)
             {
@@ -210,41 +209,50 @@ namespace CharityMS.Controllers
         public async Task<IActionResult> deleteMessage(string deleteToken, string answer, string body)
         {
             DonationRequest donationRequest = JsonConvert.DeserializeObject<DonationRequest>(body);
-            //connection
+
+            #region Delete the Message
+            //Establish connection by using the keys.
             List<string> keys = getCredentialInfo();
             var sqsClient = new AmazonSQSClient(keys[0], keys[1], keys[2], RegionEndpoint.USEast1);
+
+            //Get the Queue URL by providing the Queue Name from connection
             var response = await sqsClient.GetQueueUrlAsync(new GetQueueUrlRequest { QueueName = queueName });
 
             try
             {
+                //Define the ReceiptHandle of the message that want to delete in DeleteMessageRequest
                 DeleteMessageRequest deleteMessageRequest = new DeleteMessageRequest
                 {
                     QueueUrl = response.QueueUrl,
-                    //need this line to delete
                     ReceiptHandle = deleteToken
                 };
+
+                ////Send the Request to the AWS SQS
                 await sqsClient.DeleteMessageAsync(deleteMessageRequest);
 
-                Donation donation = new Donation()
-                {
-                    Id = donationRequest.Id,
-                    Donations = donationRequest.Donations,
-                    Reason = donationRequest.Reason,
-                    ReceiverId = donationRequest.ReceiverId,
-                    Date = DateTime.Now,
-                    StaffId = User.FindFirstValue(ClaimTypes.NameIdentifier) != null ? Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)) : Guid.Empty,
-                    Status = answer
-                };
-
-                TempData["donation"] = JsonConvert.SerializeObject(donation);
-
-                return RedirectToAction("Create");
+               
             }
             catch (AmazonSQSException ex)
             {
                 TempData["errorMsg"] = "Unable to accept/reject the message from the queue! "+ex.Message;
                 return RedirectToAction("Index");
             }
+            #endregion
+
+            Donation donation = new Donation()
+            {
+                Id = donationRequest.Id,
+                Donations = donationRequest.Donations,
+                Reason = donationRequest.Reason,
+                ReceiverId = donationRequest.ReceiverId,
+                Date = DateTime.Now,
+                StaffId = User.FindFirstValue(ClaimTypes.NameIdentifier) != null ? Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)) : Guid.Empty,
+                Status = answer
+            };
+
+            TempData["donation"] = JsonConvert.SerializeObject(donation);
+
+            return RedirectToAction("Create");
         }
 
 
@@ -291,20 +299,25 @@ namespace CharityMS.Controllers
             ViewBag.UserFullname = _userManager.GetUserId(HttpContext.User) != null ? _userManager.GetUserAsync(HttpContext.User).Result.FullName : "Unknown";
 
             #region Get Number Of Queue
-            //connection
+            //Establish connection by using the keys. 
             List<string> keys = getCredentialInfo();
             var sqsClient = new AmazonSQSClient(keys[0], keys[1], keys[2], RegionEndpoint.USEast1);
 
-            //get the queue URL 
+            //Get the Queue URL by providing the Queue Name from connection
             var response = await sqsClient.GetQueueUrlAsync(new GetQueueUrlRequest { QueueName = queueName });
 
+            //Define the GetQueueAttributesRequest to get the Total Approximate Number Of Messages
             GetQueueAttributesRequest attReq = new GetQueueAttributesRequest();
             attReq.QueueUrl = response.QueueUrl;
             attReq.AttributeNames.Add("ApproximateNumberOfMessages");
             attReq.AttributeNames.Add("ApproximateNumberOfMessagesDelayed");
             attReq.AttributeNames.Add("ApproximateNumberOfMessagesNotVisible");
+            //Send the Request and return the Response from AWS
             GetQueueAttributesResponse response1 = await sqsClient.GetQueueAttributesAsync(attReq);
-            ViewBag.QueueCount = response1.ApproximateNumberOfMessages + response1.ApproximateNumberOfMessagesDelayed + response1.ApproximateNumberOfMessagesNotVisible;
+
+            ViewBag.QueueCount = response1.ApproximateNumberOfMessages + 
+                                 response1.ApproximateNumberOfMessagesDelayed + 
+                                 response1.ApproximateNumberOfMessagesNotVisible;
             #endregion
 
             return View(donation);      
@@ -320,7 +333,6 @@ namespace CharityMS.Controllers
         {
             ResultMessageModel resultMessageModel = new ResultMessageModel();
 
-
             if (donation.Donations == null || donation.Donations.Where(x => x.ItemName != null && x.Quantity > 0).Count() < 1)
             {
                 resultMessageModel.Result = -1;
@@ -332,31 +344,33 @@ namespace CharityMS.Controllers
             donation.ReceiverId = User.FindFirstValue(ClaimTypes.NameIdentifier) != null ? Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)) : Guid.Empty;
 
             #region Send Message Queue to SQS
-            //connection
+            //Establish connection by using the keys.
             List<string> keys = getCredentialInfo();
             var sqsClient = new AmazonSQSClient(keys[0], keys[1], keys[2], RegionEndpoint.USEast1);
 
-            //get the queue URL 
+            //Get the Queue URL by providing the Queue Name from connection
             var response = await sqsClient.GetQueueUrlAsync(new GetQueueUrlRequest { QueueName = queueName });
 
-            //send the message to the queue
             try
             {
+                //Define the message want to send in SendMessageRequest
                 SendMessageRequest queueMessage = new SendMessageRequest()
                 {
                     QueueUrl = response.QueueUrl,
                     MessageBody = JsonConvert.SerializeObject(donation),
                 };
 
+                //Send the Request to the AWS SQS
                 await sqsClient.SendMessageAsync(queueMessage);
 
                 resultMessageModel.Result = 0;
                 resultMessageModel.Message = "Your donations request already sent to the charity service!\n Your track number is: " + donation.Id;
             }
+            //Catch the AmazonSQSException if there are any exception when sending the message to queue
             catch (AmazonSQSException ex)
             {
                 resultMessageModel.Result = -1;
-                resultMessageModel.Message = "Unable to send your reservation order. Please try again!\n" + ex.Message;
+                resultMessageModel.Message = "Unable to send your donation request. Please try again!\n" + ex.Message;
             }
             #endregion
 

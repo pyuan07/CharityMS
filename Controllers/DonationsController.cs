@@ -117,10 +117,15 @@ namespace CharityMS.Controllers
         //    return View(messages);
         //}
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? status)
         {
             List<DonationVM> donationVMList = new List<DonationVM>();
             IEnumerable<Donation> donationList = await _context.Donation.Include(x=>x.Donations).ToListAsync();
+
+            if (status != null)
+            {
+                donationList = donationList.Where(x => x.Status.Equals(status)).ToList();
+            }
 
             donationList.ToList().ForEach( d =>
             {

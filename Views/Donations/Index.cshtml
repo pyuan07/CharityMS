@@ -7,6 +7,18 @@
 
 <h1>Index</h1>
 
+<form asp-action="Index">
+    <div class="input-group mb-3">
+        <select class="form-select form-control" id="filter-status">
+            <option selected value="">Please select a Status to Filter</option>
+            <option value="accept">Accepted</option>
+            <option value="reject">Rejected</option>
+            <option value="received">Received</option>
+        </select>
+        <button type="button" class="btn  btn-outline-secondary" onclick="onFilter()" style="width:150px">Filter</button>
+    </div>
+</form>
+
 <p>
     @if (User.IsInRole("User"))
     {
@@ -62,15 +74,18 @@
             </td>
             <td>
                 <a class="btn btn-info" asp-action="Details" asp-route-id="@item.Id">Details</a>
-                @if (item.Status == "received")
+                @if (item.Status != "reject")
                 {
-                    <button type="button" class="btn btn-primary" asp-action="ReceivedDonation" disabled asp-route-id="@item.Id">Received</button>
-                }
-                else
-                {
-                    @if (User.IsInRole("Staff"))
+                    @if (item.Status == "received")
                     {
-                        <a class="btn btn-primary" asp-action="ReceivedDonation" asp-route-id="@item.Id">Received</a>
+                        <button type="button" class="btn btn-primary" asp-action="ReceivedDonation" disabled asp-route-id="@item.Id">Received</button>
+                    }
+                    else
+                    {
+                        @if (User.IsInRole("Staff"))
+                        {
+                            <a class="btn btn-primary" asp-action="ReceivedDonation" asp-route-id="@item.Id">Received</a>
+                        }
                     }
                 }
             </td>
@@ -112,6 +127,10 @@
                 })
 
         })
+
+        function onFilter() {
+            location.href = '@Url.Action("Index","Donations")'+'?status=' + $("#filter-status").val();
+        }
 
     </script>
 }

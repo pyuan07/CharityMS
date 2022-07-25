@@ -24,22 +24,23 @@
             </div>
         </div>
 
-
-        <div class="card mb-3">
-            <div class="card-header">
-                Request Item <span class="text-danger">*</span> :
-            </div>
-            <div class="card-body">
-                <div id="editorRows">
-                    @foreach (var item in Model.Donations)
-                    {
-                        <partial name="_DonationItem" asp-for="item" />
-                    }
+        <div class="mb-3">
+            <div class="card">
+                <div class="card-header">
+                    Request Item <span class="text-danger">*</span> :
                 </div>
-                <a id="addItem" asp-controller="Donations" asp-action="BlankItem" class="btn btn-primary btn-sm">Add Item</a>
+                <div class="card-body">
+                    <div id="editorRows">
+                        @foreach (var item in Model.Donations)
+                        {
+                            <partial name="_DonationItem" asp-for="item" />
+                        }
+                    </div>
+                    <a id="addItem" asp-controller="Donations" asp-action="BlankItem" class="btn btn-primary btn-sm">Add Item</a>
+                </div>
             </div>
+            <span id="invalid-item" class="text-danger" style="display:none">The Item Name and Quantity are Required.</span>
         </div>
-
 
         <div class="form-group row mb-3">
             <label asp-for="Reason" class="col-form-label col-lg-3 col-sm-12">
@@ -115,42 +116,57 @@
             formData.append("donation.Reason", $("#reason-textfield").val());
             formData.append("donation.ApplicantName", $("#applicant-textfield").val());
 
-            
+            let valid = false;
+
             $("input[name='ItemName']").each(function (i) {
                 var ItemName = $(this).val();
+                if (ItemName == "") {
+                    valid = false;
+                }
+
                 formData.append("donation.Donations[" + i + "].ItemName", ItemName);
             });
 
             $("input[name='Quantity']").each(function (i) {
                 var Quantity = $(this).val();
+                if (Quantity < 1) {
+                    valid = false;
+                }
                 formData.append("donation.Donations[" + i + "].Quantity", Quantity);
             });
 
-            $.ajax({
-                method: 'post',
-                url: "/Donations/CreateRequest",
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function (data) {
-                    if (data.result == -1) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Oops...',
-                            text: data.message
-                        })
+            if (valid) {
+                $("#invalid-item").hide();
+
+                $.ajax({
+                    method: 'post',
+                    url: "/Donations/CreateRequest",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (data) {
+                        if (data.result == -1) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: data.message
+                            })
+                        }
+                        else {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Congratulations',
+                                text: data.message
+                            }).then(function () {
+                                location.href = '@Url.Action("Index", "Donations")';
+                            });
+                        }
                     }
-                    else {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Congratulations',
-                            text: data.message
-                        }).then(function () {
-                            location.href = '@Url.Action("Index", "Donations")';
-                        });
-                    }
-                }
-            });
+                });
+            }
+            else {
+                $("#invalid-item").show();
+            }
 
         });
 

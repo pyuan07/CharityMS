@@ -24,6 +24,7 @@ namespace CharityMS.ViewModels
 
         [Required]
         [Display(Name = "Estimated Pick Up Date")]
+        [DisplayFormat(DataFormatString = "{0:MM/dd/yyyy}", ApplyFormatInEditMode = true)]
         public DateTime EstimatiedPickUpDate { get; set; }
 
         

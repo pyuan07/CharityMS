@@ -77,6 +77,13 @@
 
             $("input[name='EstimatiedPickUpDate']").each(function (i) {
                 var EstimatiedPickUpDate = $(this).val();
+                if (EstimatiedPickUpDate == "") {
+                    $("#invalid-date").show();
+                }
+                else {
+                    $("#invalid-date").hide();
+
+                }
                 formData.append("vm.EstimatiedPickUpDate", EstimatiedPickUpDate);
 
             });

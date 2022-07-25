@@ -8,8 +8,15 @@
 <h1>Index</h1>
 
 <p>
-    <a class="btn btn-primary" asp-action="CreateRequest">Create New Request</a>
-    <a class="btn btn-primary" asp-action="CheckRequest">Check Requests</a>
+    @if (User.IsInRole("User"))
+    {
+        <a class="btn btn-primary" asp-action="CreateRequest">Create New Request</a>
+    }
+
+    @if (User.IsInRole("Staff"))
+    {
+        <a class="btn btn-primary" asp-action="CheckRequest">Check Requests</a>
+    }
 
 </p>
 
@@ -61,7 +68,10 @@
                 }
                 else
                 {
-                    <a class="btn btn-primary" asp-action="ReceivedDonation" asp-route-id="@item.Id">Received</a>
+                    @if (User.IsInRole("Staff"))
+                    {
+                        <a class="btn btn-primary" asp-action="ReceivedDonation" asp-route-id="@item.Id">Received</a>
+                    }
                 }
             </td>
         </tr>
